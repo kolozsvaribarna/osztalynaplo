@@ -1,0 +1,36 @@
+$SESSION[] =>
+            data[] =>
+                    [..data..]
+
+            students[] =>
+                        [n..] =>
+                               [class] => class
+                               [gender] => gender
+                               [firstname]
+                               [...]
+                               [grades] =>
+                                        [math] =>
+                                                [n] => int
+                                                [..] => int
+                                                [nx] => int
+                                        [hitory] =>
+                                                [n] => int
+                                                [..] => int
+                                                [nx] => int
+                                        ...
+                                [average] => float (.00)
+
+            activeClass[] => string (eg. 11b)
+
+
+classSubjectAvgs[] =>
+            [class] =>
+                    [subject] => float (.00)
+                    ...
+                    [subject] => float (.00)
+
+            
+classAvgs[] =>
+            [class] => float (.00)
+            ...
+            [class] => float (.00)

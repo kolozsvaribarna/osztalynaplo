@@ -1,0 +1,96 @@
+/*
+@author Kolozsvári Barnabás
+*/
+* {
+    user-select: none;
+    font-family: Arial, Helvetica, sans-serif
+}
+.btn {
+    font-weight: bold;
+    padding: 5px 15px;
+    text-align: center;
+    margin:0 2px;
+    cursor: pointer;
+}
+.btn-reset {
+    color: red;
+}
+.btn-save {
+    color: green;
+}
+.btn-query {
+    color: blue;
+}
+table {
+    display: block;
+    border-collapse: collapse;
+    margin: 10px 0;
+}
+tr:nth-child(1), tr:nth-child(1):hover {
+    background-color: unset;
+}
+tr:nth-child(2n), tr:nth-child(2n).hover-disable:hover {
+    background-color: #c1e1ec;
+}
+tr:hover, tr:nth-child(2n):hover {
+    background-color: lightcoral;
+}
+tr.best-class, tr.best-class:hover {
+    background-color: #BDE7BD;
+}
+tr.worst-class, tr.worst-class:hover {
+    background-color: #FFB6B3;
+}
+td {
+    text-align: center;
+    vertical-align: middle;
+    border: 1px black solid;
+    width: 9.5vw;
+    height: 25px;
+    text-transform: capitalize;
+}
+td.bold {
+    font-weight: bold;
+}
+td.italic {
+    font-style: italic;
+}
+td.allcaps {
+    text-transform: uppercase;
+}
+td.first-col {
+    text-align: left;
+    padding-left: 2px;
+    width: 12vw;
+}
+td.table-class {
+    font-size: x-large;
+    padding: 5px;
+    background-color: white;
+    border: none;
+    text-transform: uppercase;
+}
+td.table-title {
+    padding: 5px;
+    font-weight: bold;
+}
+h2, p {
+    font-variant: small-caps;
+}
+.error {
+    font-weight: bold;
+    color: red;
+}
+.notif {
+    font-weight: bold;
+    color: green;
+}
+.msg {
+    font-weight: bold;
+    color: blue;
+}
+form {
+    display: inline-flex;
+    width: 100%;
+    margin: 0 0 10px 0;
+}
