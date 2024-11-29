@@ -18,9 +18,14 @@ $SESSION[] =>
                                                 [..] => int
                                                 [nx] => int
                                         ...
-                                [average] => float (.00)
+                               [averages] =>
+                                        [math] => float (.00)
+                                        [hitory] => float (.00)
+                                        ...
+                               [average] => float (.00)
 
-            activeClass[] => string (eg. 11b)
+
+            activeClass[] => string /* eg. 11b */
 
 
 classSubjectAvgs[] =>

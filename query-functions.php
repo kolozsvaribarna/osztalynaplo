@@ -124,8 +124,14 @@ function getWorstClassAvgBySubject($subject) {
     }
     return min($avg);
 }
-function getOrderedStudents() {
-    $studentAverages = $_SESSION['students'];
+function getOrderedStudents($class) {
+    $students = $_SESSION['students'];
 
-    return asort($studentAverages);
+    for ($i = 0; $i < count($students); $i++) {
+        if ($students[$i]['class'] == $class) {
+            $classStudents[$students[$i]['lastname'] . " " . $students[$i]['firstname']] = getSingleStudentAverage($students[$i]['grades']);
+        }
+    }
+    arsort($classStudents);
+    return $classStudents;
 }

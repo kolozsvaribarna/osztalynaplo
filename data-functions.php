@@ -29,7 +29,7 @@ elseif (isset($_GET["save"])) {
 function generateStudents() {
     $data = $_SESSION['data'];
     $classes = $data['classes'];
-    $maleFistnames = $data['firstnames']['men'];
+    $maleFirstnames = $data['firstnames']['men'];
     $femaleFirstnames = $data['firstnames']['women'];
 
     // generate data for each class's students with random class length
@@ -37,7 +37,7 @@ function generateStudents() {
         for ($i = 0; $i < random_int(10, 15); $i++) {
             if (random_int(0, 1) == 0) {
                 $gender = 'M';
-                $firstname = $maleFistnames[random_int(0, count($maleFistnames)-1)];
+                $firstname = $maleFirstnames[random_int(0, count($maleFirstnames)-1)];
             }
             else {
                 $gender = 'F';
@@ -51,6 +51,7 @@ function generateStudents() {
                 'firstname'=>$firstname,
                 'lastname'=>$data['lastnames'][random_int(0, count($data['lastnames'])-1)],
                 'grades'=> $grades,
+                'averages' => getStudentDistinctAverages($grades),
                 'average' => getSingleStudentAverage($grades),
             ];
         }
@@ -62,7 +63,7 @@ function generateStudents() {
 function getGrades() {
     $subjects = $_SESSION['data']['subjects'];
 
-    // generate random number of grades grades between 1-5 for each subject
+    // generate random number of grades between 1-5 for each subject
     foreach ($subjects as $subject) {
         if (random_int(0, 5) != 0) {
             for ($i = 0; $i < random_int(1, 5); $i++) {
@@ -73,6 +74,18 @@ function getGrades() {
         else $grades[$subject][] = "";
     }
     return $grades;
+}
+
+function getStudentDistinctAverages($grades) {
+    $subjects = $_SESSION['data']['subjects'];
+
+    foreach ($subjects as $subject) {
+        if (count($grades[$subject]) > 1) {
+            $averages[$subject] = round(array_sum($grades[$subject]) / count($grades[$subject]), 2);
+        }
+        else $averages[$subject] = "-";
+    }
+    return $averages;
 }
 
 // write header & selected class to csv
@@ -129,7 +142,7 @@ function saveClassData($file, $class) {
                 $tempGrades[] = join(',',$studentGrades[$subjects[$k]]);
             }
             // write data to csv
-            fputcsv($file,$lineData,';', eol:";");
+            fputcsv($file,$lineData,';', escape:";");
             fputcsv($file, $tempGrades, ';');
             $j++;
         }

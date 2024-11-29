@@ -29,15 +29,15 @@ function showClassList() {
 
     // form & buttons
     echo "<form method='GET'>
-        <input class='btn' type='submit' name='class' value='*'></input>";
+        <input class='btn' type='submit' name='class' value='*'>";
     foreach ($classes as $class) {
-        echo "<input class='btn' type='submit' name='class' value='$class'></input>";
+        echo "<input class='btn' type='submit' name='class' value='$class'>";
     }
-    echo "<input class='btn btn-reset' type='submit' name='reset' value='Reset students'></input>";
+    echo "<input class='btn btn-reset' type='submit' name='reset' value='Reset students'>";
     if (!isset($_GET['reset']) && !isset($_GET['query'])) {
-        echo "<input class='btn btn-save' type='submit' name='save' value='Save'></input>";
+        echo "<input class='btn btn-save' type='submit' name='save' value='Save'>";
     }
-    echo "<input class='btn btn-query' type='submit' name='query' value='Query'></input></form>";
+    echo "<input class='btn btn-query' type='submit' name='query' value='Query'></form>";
 
     // states for buttons
     if (isset($_GET['reset'])) {
@@ -65,7 +65,7 @@ if (isset($_GET['class'])) {
         }
     }
     // valid class is selected
-    elseif (array_search($class, $classes) !== false) { 
+    elseif (in_array($class, $classes) !== false) {
         displayTable($class);
     }
     // class not found
@@ -107,9 +107,9 @@ function displayTable($class) {
 }
 function showQueryOptions($type="--select--") {
     echo "<form method='GET'>
-        <input class='btn btn-query' type='submit' name='subjectAverages' value='Subject averages'></input>
-        <input class='btn btn-query' type='submit' name='studentRanking' value='Student ranking'></input>
-        <input class='btn btn-query' type='submit' name='bestAndWorstClasses' value='Best and worst classes'></input></form>
+        <input class='btn btn-query' type='submit' name='subjectAverages' value='Subject averages'>
+        <input class='btn btn-query' type='submit' name='studentRanking' value='Student ranking'>
+        <input class='btn btn-query' type='submit' name='bestAndWorstClasses' value='Best and worst classes'></form>
         <p class='msg'>Query by: $type</p>";
 }
 function showSchoolAvgsTable() {
@@ -191,6 +191,18 @@ function showDistBWClass() {
     echo "</tr></table>";
 }
 
-function showStudentRanking() {
-    echo getOrderedStudents();
+function showCumulativeClassRankings() {
+    //$students = $_SESSION['students'];
+    //$subjects = $_SESSION['data']['subjects'];
+    $classes = $_SESSION['data']['classes'];
+
+    foreach ($classes as $class) {
+        $classRanks[$class] = getOrderedStudents($class);
+        echo "<table><tr><td class='table-title allcaps'>$class</td><td class='italic bold'>Average</td></tr>";
+        for ($i = 0; $i < count($classRanks[$class]); $i++) {
+            $name = array_keys($classRanks[$class])[$i];
+            echo "<tr><td class='bold first-col'>".$i+1 .". ".$name."</td><td>". $classRanks[$class][$name]."</td></tr>";
+        }
+        echo "</table>";
+    }
 }
