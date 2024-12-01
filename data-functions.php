@@ -3,6 +3,8 @@
  * @author Kolozsvári Barnabás
  * disc: functions responsible for generating and saving data & managing the session
 */
+
+// TODO migrate conditionals to state action(?) file !!!
 session_start();
 
 require_once "classroom-data.php";
@@ -17,7 +19,7 @@ if (!isset($_SESSION['students'])){
 }
 
 // save current class to session
-if (!isset($_GET["save"]) && !isset($_GET['reset']) && isset($_GET['class'])){
+if (isset($_GET['class'])){
     $_SESSION['activeClass'] = $_GET['class'];
 }
 // call saveData when save button clicked
@@ -25,7 +27,18 @@ elseif (isset($_GET["save"])) {
     saveData();
 }
 
-// generates students and saves it to session
+if (isset($_GET['saveSchoolAvgs'])) {
+    saveSchoolAverages();
+}
+else if (isset($_GET['saveClassAvgs'])) {
+    saveClassAverages();
+}
+
+/**
+ * Generates student data and saves it to $_SESSION['students'] <br>
+ * data: class, gender, firstname, lastname, grades[], averages[], average
+ * @return void
+ */
 function generateStudents() {
     $data = $_SESSION['data'];
     $classes = $data['classes'];
@@ -58,8 +71,10 @@ function generateStudents() {
     }
     $_SESSION['students'] = $students;
 }
-
-// returns array with generated grades
+/**
+ * Generates 0..5 grades between 1..5 for all subjects
+ * @return array containing grades
+ */
 function getGrades() {
     $subjects = $_SESSION['data']['subjects'];
 
@@ -75,7 +90,10 @@ function getGrades() {
     }
     return $grades;
 }
-
+/**
+ * @param array $grades containing one student's grades
+ * @return array containing averages by subjects
+ */
 function getStudentDistinctAverages($grades) {
     $subjects = $_SESSION['data']['subjects'];
 
@@ -83,12 +101,14 @@ function getStudentDistinctAverages($grades) {
         if (count($grades[$subject]) > 1) {
             $averages[$subject] = round(array_sum($grades[$subject]) / count($grades[$subject]), 2);
         }
-        else $averages[$subject] = "-";
+        else $averages[$subject] = 0;
     }
     return $averages;
 }
-
-// write header & selected class to csv
+/**
+ * Writes $_SESSION['activeClass']'s student data to a .csv file with header
+ * @return void
+ */
 function saveData() {
     $classes = $_SESSION['data']['classes'];
     $class = $_SESSION['activeClass'];
@@ -120,8 +140,13 @@ function saveData() {
     }
     saveClassData($file, $class);
 }
-
-// write class data to csv with no header
+/**
+ * Helper-function for saveData().
+ * Writes class data to a .csv file with no header
+ * @param resource $file .csv file
+ * @param string $class selected class's name
+ * @return void
+ */
 function saveClassData($file, $class) {
     $students = $_SESSION['students'];
     $subjects = $_SESSION['data']['subjects'];
@@ -142,9 +167,58 @@ function saveClassData($file, $class) {
                 $tempGrades[] = join(',',$studentGrades[$subjects[$k]]);
             }
             // write data to csv
-            fputcsv($file,$lineData,';', escape:";");
+            fputcsv($file, $lineData, ';', eol:";");
             fputcsv($file, $tempGrades, ';');
             $j++;
         }
+    }
+}
+/**
+ * Saves the 'School averages' table to a .csv file
+ * @return void
+ */
+function saveSchoolAverages() {
+    header("Location: index.php?subjectAverages=Subject+averages");
+
+    if (!is_dir("export")) {
+        mkdir("export");
+    }
+
+    $subjects = $_SESSION['data']['subjects'];
+    $header = ['math', 'history', 'biology', 'chemistry', 'physics', 'informatics', 'alchemy', 'astrology', 'average'];
+    $file = fopen("export\\schoolAverages-".date("Y-m-d_Hi").".csv", 'w');
+    fputcsv($file, $header, ';');
+
+    for ($i = 0; $i < count($subjects); $i++) {
+        $avgs[] = getSchoolSubjectAvgs()[$subjects[$i]];
+    }
+    $avgs[] = round(array_sum(getSchoolSubjectAvgs()) / count(getSchoolSubjectAvgs()), 2);
+    fputcsv($file, $avgs, ';');
+}
+/**
+ *  Saves the 'Class averages' table to a .csv file <br>
+ * @return void
+ */
+function saveClassAverages() {
+    header("Location: index.php?subjectAverages=Subject+averages");
+
+    if (!is_dir("export")) {
+        mkdir("export");
+    }
+
+    $classes = $_SESSION['data']['classes'];
+    $subjects = $_SESSION['data']['subjects'];
+    $header = ['class', 'math', 'history', 'biology', 'chemistry', 'physics', 'informatics', 'alchemy', 'astrology', 'average'];
+    $file = fopen("export\\classAverages-".date("Y-m-d_Hi").".csv", 'w');
+    fputcsv($file, $header, ';');
+
+    foreach ($classes as $class) {
+        $lineData = [];
+        $lineData[] = $class;
+        for ($i = 0; $i < count($subjects); $i++) {
+            $lineData[] = getClassSubjectAvgs($class)[$subjects[$i]];
+        }
+        $lineData[] = getCumulativeClassAvg($class);
+        fputcsv($file, $lineData, ';');
     }
 }

@@ -141,9 +141,34 @@ function getOrderedClassBySubject($class, $subject) {
 
     for ($i = 0; $i < count($students); $i++) {
         if ($students[$i]['class'] == $class) {
-            $temp[$students[$i]['lastname'] . " " . $students[$i]['firstname']] = $students[$i]['averages'][$subject];
+            if ($students[$i]['averages'] != '-') {
+                $temp[$students[$i]['lastname'] . " " . $students[$i]['firstname']] = $students[$i]['averages'][$subject];
+            }
+            else {
+                $temp[$students[$i]['lastname'] . " " . $students[$i]['firstname']] = 0;
+            }
         }
     }
     arsort($temp);
     return $temp;
+}
+
+function getOrderedSchool() {
+    $students = $_SESSION['students'];
+
+    for ($i = 0; $i < count($students); $i++) {
+        $studentAvgs[$students[$i]['class'].", ".$students[$i]['lastname']." ".$students[$i]['firstname']] = $students[$i]['average'];
+    }
+    arsort($studentAvgs);
+    return $studentAvgs;
+}
+
+function getOrderedSchoolBySubject($subject) {
+    $students = $_SESSION['students'];
+
+    for ($i = 0; $i < count($students); $i++) {
+        $subjectRank[$students[$i]['class'].", ".$students[$i]['lastname']." ".$students[$i]['firstname']] = $students[$i]['averages'][$subject];
+    }
+    arsort($subjectRank);
+    return $subjectRank;
 }
