@@ -77,6 +77,12 @@ td.table-title {
 h2, p {
     font-variant: small-caps;
 }
+h2.class-title {
+    margin-left: 2.5vh;
+    margin-bottom: 0;
+    font-size: xx-large;
+    text-transform: uppercase;
+}
 .error {
     font-weight: bold;
     color: red;
@@ -93,4 +99,24 @@ form {
     display: inline-flex;
     width: 100%;
     margin: 0 0 10px 0;
+}
+table.class-ranking-table tr {
+    background-color: unset;
+}
+table.class-ranking-table tr:nth-child(n+2):hover {
+    background-color: #c1e1ec;
+}
+table.class-ranking-table tr:nth-child(-n+4):nth-child(n+2) {
+    background-color: #BDE7BD;
+}
+table.class-ranking-table tr:nth-child(-n+4):nth-child(n+2):hover {
+    background-color: forestgreen;
+    color: white;
+}
+table.class-ranking-table tr:nth-last-child(-n+3):nth-last-child(n+1) {
+    background-color: #FFB6B3;
+}
+table.class-ranking-table tr:nth-last-child(-n+3):nth-last-child(n+1):hover {
+    background-color: indianred;
+    color: white;
 }

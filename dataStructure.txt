@@ -1,41 +1,25 @@
 $SESSION[] =>
             data[] =>
                     [..data..]
-
             students[] =>
-                        [n..] =>
+                        [$i] =>
                                [class] => class
                                [gender] => gender
-                               [firstname]
+                               [firstname] => ..
                                [...]
                                [grades] =>
                                         [math] =>
                                                 [n] => int
                                                 [..] => int
                                                 [nx] => int
-                                        [hitory] =>
+                                        [history] =>
                                                 [n] => int
                                                 [..] => int
                                                 [nx] => int
                                         ...
                                [averages] =>
                                         [math] => float (.00)
-                                        [hitory] => float (.00)
+                                        [history] => float (.00)
                                         ...
                                [average] => float (.00)
-
-
-            activeClass[] => string /* eg. 11b */
-
-
-classSubjectAvgs[] =>
-            [class] =>
-                    [subject] => float (.00)
-                    ...
-                    [subject] => float (.00)
-
-            
-classAvgs[] =>
-            [class] => float (.00)
-            ...
-            [class] => float (.00)
+            activeClass[] => string (eg. "11.b")

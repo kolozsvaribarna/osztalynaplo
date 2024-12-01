@@ -135,3 +135,15 @@ function getOrderedStudents($class) {
     arsort($classStudents);
     return $classStudents;
 }
+
+function getOrderedClassBySubject($class, $subject) {
+    $students = $_SESSION['students'];
+
+    for ($i = 0; $i < count($students); $i++) {
+        if ($students[$i]['class'] == $class) {
+            $temp[$students[$i]['lastname'] . " " . $students[$i]['firstname']] = $students[$i]['averages'][$subject];
+        }
+    }
+    arsort($temp);
+    return $temp;
+}

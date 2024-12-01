@@ -192,16 +192,32 @@ function showDistBWClass() {
 }
 
 function showCumulativeClassRankings() {
-    //$students = $_SESSION['students'];
-    //$subjects = $_SESSION['data']['subjects'];
+    $students = $_SESSION['students'];
+    $subjects = $_SESSION['data']['subjects'];
     $classes = $_SESSION['data']['classes'];
 
     foreach ($classes as $class) {
         $classRanks[$class] = getOrderedStudents($class);
-        echo "<table><tr><td class='table-title allcaps'>$class</td><td class='italic bold'>Average</td></tr>";
-        for ($i = 0; $i < count($classRanks[$class]); $i++) {
-            $name = array_keys($classRanks[$class])[$i];
-            echo "<tr><td class='bold first-col'>".$i+1 .". ".$name."</td><td>". $classRanks[$class][$name]."</td></tr>";
+
+        // table header
+        echo "<h2 class='class-title'>$class</h2>
+            <table class='class-ranking-table'><tr><td class='bold table-title'>Rank</td><td class='bold'>All</td>";
+        foreach ($subjects as $subject) {
+            echo "<td class='bold'>$subject</td>";
+        }
+        echo "</tr>";
+
+        // data fields
+        $j = 0;
+        for ($i = 0; $i < count($students); $i++) {
+            if ($students[$i]['class'] == $class) {
+                echo "<tr><td class='bold'>". $j+1 .".</td><td>". array_keys($classRanks[$class])[$j]."</td>";
+                foreach ($subjects as $subject) {
+                    echo "<td>". array_keys(getOrderedClassBySubject($class, $subject))[$j] ."</td>";
+                }
+                echo"</tr>";
+                $j++;
+            }
         }
         echo "</table>";
     }
