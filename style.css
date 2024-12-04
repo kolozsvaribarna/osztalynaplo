@@ -78,8 +78,8 @@ h2, p {
     font-variant: small-caps;
 }
 h2.class-title {
-    margin-left: 2.5vh;
-    margin-bottom: 0;
+    /*width: 23vw;*/
+    /*width: fit-content;*/
     font-size: xx-large;
     text-transform: uppercase;
 }

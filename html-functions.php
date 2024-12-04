@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Kolozsvári Barnabás
- * disc: code responsible for the site's HTML
+ * desc: code responsible for the site's HTML
 */
 
 require_once "data-functions.php";
@@ -150,60 +150,48 @@ function showClassAvgsTable() {
     echo "</table>";
     echo "<form method='get'><input class='btn btn-save' type='submit' value='Save' name='saveClassAvgs'></form>";
 }
-function showCumulativeBWClass() {
+function showBestWorstClass() {
+    $subjects = $_SESSION['data']['subjects'];
     $bestClass = getBestClassByAvg();
     $worstClass = getWorstClassByAvg();
-    echo "<table>
-    <tr>
-        <td class='table-title italic'>Cumulative</td>
-        <td class='bold'>Class</td><td class='bold'>Average</td></tr>
-    <tr class='best-class'>
-        <td>Best</td><td class='allcaps bold'>$bestClass</td>
-        <td class='italic'>".getCumulativeClassAvg($bestClass)."</td></tr>
-    <tr class='worst-class'>
-        <td>Worst</td><td class='allcaps bold '>$worstClass</td>
-        <td class='italic'>".getCumulativeClassAvg($worstClass)."</td></tr>
-    </table>";
-}
-function showDistBWClass() {
-    $subjects = $_SESSION['data']['subjects'];
 
-    echo "<table><tr><td class='bold italic table-title'>Distinct</td>";
+    echo "<table><tr><td class='table-class'></td><td class='bold'>Overall</td>";
     foreach($subjects as $subject) {
         echo "<td class='bold'>$subject</td>";
     }
     // BEST
-    echo "</tr><tr class='best-class'><td class='bold' rowspan='2'>Best</td>";
+    echo "</tr><tr class='best-class'><td class='bold' rowspan='2'>Best</td><td class='bold allcaps'>$bestClass</td>";
     foreach($subjects as $subject) {
         echo "<td class='bold allcaps'>".getBestClassBySubjectAvg($subject)."</td>";
     }
-    echo "</tr><tr class='best-class'>";
+    echo "</tr><tr class='best-class'><td class='italic'>".getCumulativeClassAvg($bestClass)."</td>";
     foreach($subjects as $subject) {
         echo "<td class='italic'>".getBestClassAvgBySubject($subject)."</td>"; 
     }
     // WORST
-    echo "</tr><tr class='worst-class'><td class='bold' rowspan='2'>Worst</td>";
+    echo "</tr><tr class='worst-class'><td class='bold' rowspan='2'>Worst</td><td class='bold allcaps'>$worstClass</td>";
     foreach($subjects as $subject) {
         echo "<td class='bold allcaps'>".getWorstClassBySubjectAvg($subject)."</td>";
     }
-    echo "</tr><tr class='worst-class'>";
+    echo "</tr><tr class='worst-class'><td>".getCumulativeClassAvg($worstClass)."</td>";
     foreach($subjects as $subject) {
         echo "<td class='italic'>".getWorstClassAvgBySubject($subject)."</td>"; 
     }
     echo "</tr></table>";
+    echo "<form method='get'><input class='btn btn-save' type='submit' value='Save' name='saveBeWoClass'></form>";
 }
-
 function showCumulativeClassRankings() {
     $students = $_SESSION['students'];
     $subjects = $_SESSION['data']['subjects'];
     $classes = $_SESSION['data']['classes'];
 
+    echo "<form method='get'><input class='btn btn-save' type='submit' value='Save all' name='saveClassRanking'></form>";
     foreach ($classes as $class) {
         $classRanks[$class] = getOrderedStudents($class);
 
         // table header
         echo "<h2 class='class-title'>$class</h2>
-            <table class='class-ranking-table'><tr><td class='bold table-title'>Rank</td><td class='bold'>All</td>";
+            <table class='class-ranking-table'><tr><td class='bold table-title'>Rank</td><td class='bold'>Overall</td>";
         foreach ($subjects as $subject) {
             echo "<td class='bold'>$subject</td>";
         }
@@ -224,12 +212,12 @@ function showCumulativeClassRankings() {
         echo "</table>";
     }
 }
-
 function showSchoolRanking() {
     $students = $_SESSION['students'];
     $subjects = $_SESSION['data']['subjects'];
 
     $orderedSchool = getOrderedSchool();
+    echo "<form method='get'><input class='btn btn-save' type='submit' value='Save' name='saveSchoolRanking'></form>";
     // table header
     echo "<h2 class='class-title'>All students</h2>
         <table class='class-ranking-table'><tr><td class='bold table-title'>Rank</td><td class='bold'>Overall</td>";
@@ -251,7 +239,6 @@ function showSchoolRanking() {
     }
     echo "</table>";
 }
-
 function showStudentRankingOptions() {
     echo "<form method='GET'>
         <input class='btn btn-query' type='submit' name='rankClasses' value='Rank by classes'>

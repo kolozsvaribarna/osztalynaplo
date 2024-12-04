@@ -1,10 +1,10 @@
 <?php
 /**
  * @author Kolozsvári Barnabás
- * disc: functions responsible for generating and saving data & managing the session
+ * desc: functions responsible for generating and saving data & managing the session
 */
 
-// TODO migrate conditionals to state action(?) file !!!
+// TODO migrate conditionals to a state-observer file !!!
 session_start();
 
 require_once "classroom-data.php";
@@ -32,6 +32,15 @@ if (isset($_GET['saveSchoolAvgs'])) {
 }
 else if (isset($_GET['saveClassAvgs'])) {
     saveClassAverages();
+}
+else if (isset($_GET['saveBeWoClass'])) {
+    saveBeWoClass();
+}
+else if (isset($_GET['saveSchoolRanking'])) {
+    saveSchoolRanking();
+}
+else if (isset($_GET['saveClassRanking'])) {
+    saveClassRanking();
 }
 
 /**
@@ -196,7 +205,7 @@ function saveSchoolAverages() {
     fputcsv($file, $avgs, ';');
 }
 /**
- *  Saves the 'Class averages' table to a .csv file <br>
+ *  Saves the 'Class averages' table to a .csv file
  * @return void
  */
 function saveClassAverages() {
@@ -220,5 +229,97 @@ function saveClassAverages() {
         }
         $lineData[] = getCumulativeClassAvg($class);
         fputcsv($file, $lineData, ';');
+    }
+}
+/**
+ * Saves the 'Best and worst classes' table to a .csv file
+ * @return void
+ */
+function saveBeWoClass() {
+    header("Location: index.php?bestAndWorstClasses=Best+and+worst+classes");
+
+    if (!is_dir("export")) {
+        mkdir("export");
+    }
+
+    $subjects = $_SESSION['data']['subjects'];
+    $header = ['type', 'overall', 'overallAvg', 'math', 'mathAcg', 'history', 'historyAvg', 'biology', 'biologyAvg', 'chemistry', 'chemistryAvg', 'physics', 'physicsAvg', 'informatics', 'informaticsAvg',  'alchemy', 'alchemyAvg', 'astrology', 'astrologyAvg'];
+    $file = fopen("export\\bestWorstClasses-".date("Y-m-d_Hi").".csv", 'w');
+    fputcsv($file, $header, ';');
+
+    // BEST CLASSES
+    $lineData = [];
+    $lineData += ['best', getBestClassByAvg(), getCumulativeClassAvg(getBestClassByAvg())];
+    foreach ($subjects as $subject) {
+        $lineData[] = getBestClassBySubjectAvg($subject);
+        $lineData[] = getBestClassAvgBySubject($subject);
+    }
+    fputcsv($file, $lineData, ';');
+
+    // WORST CLASSES
+    $lineData = [];
+    $lineData += ['worst', getWorstClassByAvg(), getCumulativeClassAvg(getWorstClassByAvg())];
+    foreach ($subjects as $subject) {
+        $lineData[] = getWorstClassBySubjectAvg($subject);
+        $lineData[] = getWorstClassAvgBySubject($subject);
+    }
+    fputcsv($file, $lineData, ';');
+}
+/**
+ * Saves all students ranked by overall/subjects in a .csv file
+ * @return void
+ */
+function saveSchoolRanking() {
+    header("Location: index.php?rankSchool=Rank+whole+school");
+
+    if (!is_dir("export")) {
+        mkdir("export");
+    }
+
+    $header = ['rank', 'overall', 'math', 'history', 'biology', 'chemistry', 'physics', 'informatics', 'alchemy', 'astrology'];
+    $file = fopen("export\\schoolRanking-".date("Y-m-d_Hi").".csv", 'w');
+    fputcsv($file, $header, ';');
+
+    $subjects = $_SESSION['data']['subjects'];
+    $orderedSchool = getOrderedSchool();
+    for ($i = 0; $i < count($orderedSchool); $i++) {
+        $lineData = [];
+        $lineData += [$i+1 ,array_keys($orderedSchool)[$i]];
+        foreach ($subjects as $subject) {
+            $lineData[] = array_keys(getOrderedSchoolBySubject($subject))[$i];
+        }
+    fputcsv($file, $lineData, ';');
+    }
+}
+/**
+ * Saves all students based on class ranked by overall/subjects in a .csv file
+ * @return void
+ */
+function saveClassRanking() {
+    header("Location: index.php?rankClasses=Rank+by+classes");
+
+    if (!is_dir("export")) {
+        mkdir("export");
+    }
+
+    $header = ['class', 'rank', 'overall', 'math', 'history', 'biology', 'chemistry', 'physics', 'informatics', 'alchemy', 'astrology'];
+    $file = fopen("export\\classRankings-".date("Y-m-d_Hi").".csv", 'w');
+    fputcsv($file, $header, ';');
+
+    $classes = $_SESSION['data']['classes'];
+    $subjects = $_SESSION['data']['subjects'];
+    foreach ($classes as $class) {
+        $orderedStudents = getOrderedStudents($class);
+        $j = 0;
+        $lineData[] = $class;
+        for ($i = 0; $i < count($orderedStudents); $i++) {
+            $lineData = [];
+            $lineData += [$class, $j+1 ,array_keys($orderedStudents)[$i]];
+            foreach ($subjects as $subject) {
+                $lineData[] = array_keys(getOrderedClassBySubject($class, $subject))[$j];
+            }
+            $j++;
+            fputcsv($file, $lineData, ';');
+        }
     }
 }

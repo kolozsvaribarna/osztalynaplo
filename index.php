@@ -17,13 +17,12 @@ if (isset($_GET['subjectAverages'])) {
     showClassAvgsTable();
 }
 elseif (isset($_GET['studentRanking'])) {
-    showQueryOptions();
+    showQueryOptions("Student averages");
     showStudentRankingOptions();
 }
 elseif (isset($_GET['bestAndWorstClasses'])) {
     showQueryOptions("Best and worst classes");
-    showCumulativeBWClass();
-    showDistBWClass();
+    showBestWorstClass();
 }
 
 if (isset($_GET['rankClasses'])) {

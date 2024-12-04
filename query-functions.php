@@ -1,7 +1,7 @@
 <?php
 /**
  * @author Kolozsvári Barnabás
- * disc: functions responsible for calculating averages and queries, and returning the html
+ * desc: functions responsible for calculating averages and queries, and returning the html
 */
 
 // displayed next to subjects in main table
@@ -141,7 +141,7 @@ function getOrderedClassBySubject($class, $subject) {
 
     for ($i = 0; $i < count($students); $i++) {
         if ($students[$i]['class'] == $class) {
-            if ($students[$i]['averages'] != '-') {
+            if ($students[$i]['averages'] != "") {
                 $temp[$students[$i]['lastname'] . " " . $students[$i]['firstname']] = $students[$i]['averages'][$subject];
             }
             else {
