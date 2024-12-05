@@ -28,6 +28,7 @@ elseif (isset($_GET['bestAndWorstClasses'])) {
 if (isset($_GET['rankClasses'])) {
     showQueryOptions("Student averages - Classes");
     showStudentRankingOptions();
+    // table
     showCumulativeClassRankings();
 }
 elseif (isset($_GET['rankSchool'])) {

@@ -7,6 +7,10 @@
 require_once "data-functions.php";
 require_once "query-functions.php";
 
+/**
+ * Displays the HTML header
+ * @return void
+ */
 function htmlHead() {
     echo "
     <!DOCTYPE html>
@@ -22,8 +26,10 @@ function htmlHead() {
     </body>
     </html>";
 }
-
-// shows buttons with classes/reset/save
+/**
+ * Display form containing class selector/rest/save/query buttons
+ * @return void
+ */
 function showClassList() {
     $classes = $_SESSION['data']['classes'];
 
@@ -42,36 +48,15 @@ function showClassList() {
     // states for buttons
     if (isset($_GET['reset'])) {
         session_destroy();
-        echo "<p class='notif'>Students successfully reset!</p>";
+        showMessagebox("Student successfully reset");
     }
     if (isset($_GET['query'])) showQueryOptions();
 }
-// displaying data when a class is selected
-if (isset($_GET['class'])) {
-
-    if (isset($_SESSION['students'])){
-        $students = $_SESSION['students'];
-    }
-
-    $class = $_GET['class'];
-    $classes = $_SESSION['data']['classes'];
-    showClassList();
-
-    // every class selected
-    if ($class == '*') {
-        echo "<h2>All classes</h2>";
-        foreach ($classes as $class) {
-            displayTable($class);
-        }
-    }
-    // valid class is selected
-    elseif (in_array($class, $classes) !== false) {
-        displayTable($class);
-    }
-    // class not found
-    else echo "<p class='error'>Class '".$_GET['class']."' not found!</p>";
-}
-// display given class's data table
+/**
+ * Displays a table containing class's students, their grades and overall individual average
+ * @param $class string which class's table to display
+ * @return void
+ */
 function displayTable($class) {
     $students = $_SESSION['students'];
     $subjects = $_SESSION['data']['subjects'];
@@ -105,6 +90,22 @@ function displayTable($class) {
     }
     echo "</table>";
 }
+/**
+ * Shows a messagebox with a custom message
+ * @param $msg string the message to be displayed
+ * @param $type string "error" to add error msg style
+ * @return void
+ */
+function showMessagebox($msg, $type="") {
+    echo "<div class='messagebox $type'>
+         <p>$msg</p>
+        </div>";
+}
+/**
+ * Displays the form with more query options, and a "Rank by: $msg"
+ * @param $msg string the message to displayed
+ * @return void
+ */
 function showQueryOptions($msg="--select--") {
     echo "<form method='GET'>
         <input class='btn btn-query' type='submit' name='subjectAverages' value='Subject averages'>
@@ -112,6 +113,10 @@ function showQueryOptions($msg="--select--") {
         <input class='btn btn-query' type='submit' name='bestAndWorstClasses' value='Best and worst classes'></form>
         <p class='msg'>Rank by: $msg</p>";
 }
+/**
+ * Displays cumulative school averages based on subjects
+ * @return void
+ */
 function showSchoolAvgsTable() {
     $subjects = $_SESSION['data']['subjects'];
     
@@ -128,6 +133,10 @@ function showSchoolAvgsTable() {
     echo "<td>". round(array_sum(getSchoolSubjectAvgs()) / count(getSchoolSubjectAvgs()), 2) ."</td></tr></table>";
     echo "<form method='get'><input class='btn btn-save' type='submit' value='Save' name='saveSchoolAvgs'></form>";
 }
+/**
+ * Displays class's subject/overall averages
+ * @return void
+ */
 function showClassAvgsTable() {
     $subjects = $_SESSION['data']['subjects'];
     $classes = $_SESSION['data']['classes'];
@@ -150,6 +159,10 @@ function showClassAvgsTable() {
     echo "</table>";
     echo "<form method='get'><input class='btn btn-save' type='submit' value='Save' name='saveClassAvgs'></form>";
 }
+/**
+ * Displays table containing the best and worst classes and their averages by subject/overall
+ * @return void
+ */
 function showBestWorstClass() {
     $subjects = $_SESSION['data']['subjects'];
     $bestClass = getBestClassByAvg();
@@ -180,6 +193,10 @@ function showBestWorstClass() {
     echo "</tr></table>";
     echo "<form method='get'><input class='btn btn-save' type='submit' value='Save' name='saveBeWoClass'></form>";
 }
+/**
+ * Displays all class's table containing student ranking based on subjects/overall
+ * @return void
+ */
 function showCumulativeClassRankings() {
     $students = $_SESSION['students'];
     $subjects = $_SESSION['data']['subjects'];
@@ -212,6 +229,10 @@ function showCumulativeClassRankings() {
         echo "</table>";
     }
 }
+/**
+ * Displays all students and their classes, ranked by subjects/overall
+ * @return void
+ */
 function showSchoolRanking() {
     $students = $_SESSION['students'];
     $subjects = $_SESSION['data']['subjects'];
@@ -239,6 +260,10 @@ function showSchoolRanking() {
     }
     echo "</table>";
 }
+/**
+ * Displays the form containing further query options for ranking students (by class/whole school)
+ * @return void
+ */
 function showStudentRankingOptions() {
     echo "<form method='GET'>
         <input class='btn btn-query' type='submit' name='rankClasses' value='Rank by classes'>

@@ -3,45 +3,11 @@
  * @author Kolozsvári Barnabás
  * desc: functions responsible for generating and saving data & managing the session
 */
-
-// TODO migrate conditionals to a state-observer file !!!
 session_start();
 
 require_once "classroom-data.php";
 require_once "query-functions.php";
-
-if (!isset($_SESSION['data'])) {
-    $_SESSION["data"] = getData();
-}
-
-if (!isset($_SESSION['students'])){
-    generateStudents();
-}
-
-// save current class to session
-if (isset($_GET['class'])){
-    $_SESSION['activeClass'] = $_GET['class'];
-}
-// call saveData when save button clicked
-elseif (isset($_GET["save"])) {
-    saveData();
-}
-
-if (isset($_GET['saveSchoolAvgs'])) {
-    saveSchoolAverages();
-}
-else if (isset($_GET['saveClassAvgs'])) {
-    saveClassAverages();
-}
-else if (isset($_GET['saveBeWoClass'])) {
-    saveBeWoClass();
-}
-else if (isset($_GET['saveSchoolRanking'])) {
-    saveSchoolRanking();
-}
-else if (isset($_GET['saveClassRanking'])) {
-    saveClassRanking();
-}
+require_once "state-actions.php";
 
 /**
  * Generates student data and saves it to $_SESSION['students'] <br>
@@ -243,7 +209,7 @@ function saveBeWoClass() {
     }
 
     $subjects = $_SESSION['data']['subjects'];
-    $header = ['type', 'overall', 'overallAvg', 'math', 'mathAcg', 'history', 'historyAvg', 'biology', 'biologyAvg', 'chemistry', 'chemistryAvg', 'physics', 'physicsAvg', 'informatics', 'informaticsAvg',  'alchemy', 'alchemyAvg', 'astrology', 'astrologyAvg'];
+    $header = ['type', 'overall', 'overallAvg', 'math', 'mathAvg', 'history', 'historyAvg', 'biology', 'biologyAvg', 'chemistry', 'chemistryAvg', 'physics', 'physicsAvg', 'informatics', 'informaticsAvg',  'alchemy', 'alchemyAvg', 'astrology', 'astrologyAvg'];
     $file = fopen("export\\bestWorstClasses-".date("Y-m-d_Hi").".csv", 'w');
     fputcsv($file, $header, ';');
 
@@ -322,4 +288,5 @@ function saveClassRanking() {
             fputcsv($file, $lineData, ';');
         }
     }
+    showMessagebox("export/classRankings-".date("Y-m-d_Hi").".csv");
 }

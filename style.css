@@ -120,3 +120,37 @@ table.class-ranking-table tr:nth-last-child(-n+3):nth-last-child(n+1):hover {
     background-color: indianred;
     color: white;
 }
+.messagebox {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    padding: 15px 20px;
+    background-color: #2b812f;
+    color: white;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    font-family: Arial, sans-serif;
+    opacity: 0;
+    animation: showAndHide 5s ease forwards;
+}
+.messagebox.error {
+    background-color: #dc3545;
+}
+@keyframes showAndHide {
+    0% {
+        opacity: 0;
+        transform: translateY(-20px); /* fade in */
+    }
+    10% {
+        opacity: 1;
+        transform: translateY(0); /* visible */
+    }
+    90% {
+        opacity: 1;
+        transform: translateY(0); /* visible */
+    }
+    100% {
+        opacity: 0;
+        transform: translateY(-20px); /* fade out */
+    }
+}

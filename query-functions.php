@@ -4,7 +4,11 @@
  * desc: functions responsible for calculating averages and queries, and returning the html
 */
 
-// displayed next to subjects in main table
+/**
+ * Displayed next to the subjects in the main table
+ * @param $grades array containing grades from which the average is calculated
+ * @return float the average
+ */
 function getSingleStudentAverage($grades) {
     $subjects = $_SESSION['data']['subjects'];
     $averages = [];
@@ -18,7 +22,11 @@ function getSingleStudentAverage($grades) {
     }
     return round(array_sum($averages) / $c,2);
 }
-// class averages by subjects
+/**
+ * Returns associative array containing averages for each subject for given class
+ * @param $class string which class's average to calculate
+ * @return array associative array, [$subject] => float (average for the subject)
+ */
 function getClassSubjectAvgs($class) {
     $students = $_SESSION['students'];
     $subjects = $_SESSION['data']['subjects'];
@@ -135,7 +143,6 @@ function getOrderedStudents($class) {
     arsort($classStudents);
     return $classStudents;
 }
-
 function getOrderedClassBySubject($class, $subject) {
     $students = $_SESSION['students'];
 
@@ -152,7 +159,6 @@ function getOrderedClassBySubject($class, $subject) {
     arsort($temp);
     return $temp;
 }
-
 function getOrderedSchool() {
     $students = $_SESSION['students'];
 
@@ -162,7 +168,6 @@ function getOrderedSchool() {
     arsort($studentAvgs);
     return $studentAvgs;
 }
-
 function getOrderedSchoolBySubject($subject) {
     $students = $_SESSION['students'];
 
