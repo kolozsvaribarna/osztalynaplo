@@ -4,35 +4,19 @@
 */
 
 require_once "html-functions.php";
+require_once "database-setup.php";
 
 htmlHead();
 
-if (!isset($_GET['class'])){
-    showClassList();
+if (isset($_GET['initDB'])) {
+    header("Location: index.php");
+    initDB();
+    uploadDB();
+}
+else if (!isset($_GET['initDB'])) {
+    showDBInitBtn();
 }
 
-if (isset($_GET['subjectAverages'])) {
-    showQueryOptions("Subject averages");
-    showSchoolAvgsTable();
-    showClassAvgsTable();
-}
-elseif (isset($_GET['studentRanking'])) {
-    showQueryOptions("Student averages");
-    showStudentRankingOptions();
-}
-elseif (isset($_GET['bestAndWorstClasses'])) {
-    showQueryOptions("Best and worst classes");
-    showBestWorstClass();
-}
-
-if (isset($_GET['rankClasses'])) {
-    showQueryOptions("Student averages - Classes");
-    showStudentRankingOptions();
-    // table
-    showCumulativeClassRankings();
-}
-elseif (isset($_GET['rankSchool'])) {
-    showQueryOptions("Student averages - Whole school");
-    showStudentRankingOptions();
-    showSchoolRanking();
+foreach (getAllStudents() as $student) {
+    echo '<pre>'; print_r($student); echo '</pre>';
 }
