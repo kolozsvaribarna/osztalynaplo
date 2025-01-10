@@ -47,3 +47,18 @@ function getGrades() {
     }
     return $grades;
 }
+
+function getAllStudents()
+{
+    $mysqli = new mysqli("localhost", "root", "");
+    $mysqli->query("USE classroom;");
+
+    // returns (student_id, firstname, lastname, gender, class) as assoc array
+    $allStudents = $mysqli->query("SELECT s.id, s.firstname, s.lastname, s.gender, c.class_name
+                          FROM students s
+                          JOIN classes c
+                          ON s.class_id=c.id;
+    ");
+    $mysqli->close();
+    return $allStudents;
+}

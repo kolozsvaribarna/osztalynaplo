@@ -8,15 +8,31 @@ require_once "database-setup.php";
 
 htmlHead();
 
-if (isset($_GET['initDB'])) {
-    header("Location: index.php");
-    initDB();
-    uploadDB();
-}
-else if (!isset($_GET['initDB'])) {
+showClassList();
+
+// show button if db does not exist
+$mysqli = new mysqli("localhost", "root", "");
+if (1 != count(mysqli_fetch_all($mysqli->query("SHOW DATABASES LIKE 'classroom';")))) {
     showDBInitBtn();
 }
 
-foreach (getAllStudents() as $student) {
-    echo '<pre>'; print_r($student); echo '</pre>';
+// displaying data when a class is selected
+if (isset($_GET['class'])) {
+
+    $class = $_GET['class'];
+    $classes = $_SESSION['data']['classes'];
+
+    // every class selected
+    if ($class == '*') {
+        echo "<h2>All classes</h2>";
+        foreach ($classes as $class) {
+            displayTable($class);
+        }
+    }
+    // valid class is selected
+    elseif (in_array($class, $classes) !== false) {
+        displayTable($class);
+    }
+    // class not found
+    else echo "<p class='msg'>No class found</p>";
 }
