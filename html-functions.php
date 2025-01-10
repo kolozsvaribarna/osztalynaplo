@@ -64,7 +64,6 @@ function displayTable($class) {
 
     $subjects = $mysqli->query("SELECT subject_name AS name, id FROM subjects");
 
-
     // header
     echo "<table><tr><td class='table-class bold'>$class</td>";
     foreach ($subjects as $subject) {
@@ -79,7 +78,8 @@ function displayTable($class) {
         // display student's index, full name, gender
         echo "<tr><td class='bold first-col'>$i. ".$student["lastname"]." ".$student["firstname"]." (".$student["gender"].")</td>";
 
-        // display student's grades
+        // display student's grades and average
+        $gradesAvg = [];
         foreach ($subjects as $subject)
         {
             $grades = $mysqli->query("SELECT g.grade
@@ -91,14 +91,19 @@ function displayTable($class) {
             if (array_sum($grades->fetch_assoc()) > 0)
             {
                 echo "<td>";
-                foreach ($grades as $grade) echo $grade['grade'] ." ";
+                foreach ($grades as $grade)
+                {
+                    echo $grade['grade'] ." ";
+                    $gradesAvg[] = $grade['grade'];
+                }
                 echo "</td>";
             }
             else echo "<td>-</td>";
         }
-        echo "<td>.</td>";
-        echo "</tr>";
+        // cumulative average
+        echo "<td>".round(array_sum($gradesAvg) / count($gradesAvg),2)."</td></tr>";
         $i++;
     }
     echo "</table>";
+    $mysqli->close();
 }
