@@ -21,12 +21,23 @@
 .btn-query {
     color: blue;
 }
+.btn-right {
+    display: inline-block;
+    margin-right: 10px;
+    float: right;
+}
 .msg {
     color: green;
     font-weight: bold
 }
-
-/* IMPORTED TODO REWIND*/
+.msg-error {
+    color: red;
+    font-weight: bold;
+}
+.msg-right {
+    text-align: right;
+    margin-right: 10px;
+}
 
 table {
     display: block;
@@ -85,8 +96,6 @@ h2, p {
     font-variant: small-caps;
 }
 h2.class-title {
-    /*width: 23vw;*/
-    /*width: fit-content;*/
     font-size: xx-large;
     text-transform: uppercase;
 }

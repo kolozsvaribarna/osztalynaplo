@@ -2,63 +2,37 @@
 
 require_once "classroom-data.php";
 
-function generateStudents() {
+function generateSingleStudent() {
     $data = $_SESSION['data'];
-    $classes = $data['classes'];
     $maleFirstnames = $data['firstnames']['men'];
     $femaleFirstnames = $data['firstnames']['women'];
 
-    // generate data for each class's students with random class length
-    foreach ($classes as $class) {
-        for ($i = 0; $i < random_int(10, 15); $i++) {
-            if (random_int(0, 1) == 0) {
-                $gender = 'M';
-                $firstname = $maleFirstnames[random_int(0, count($maleFirstnames)-1)];
-            }
-            else {
-                $gender = 'F';
-                $firstname = $femaleFirstnames[random_int(0, count($femaleFirstnames)-1)];
-            }
-            $grades = getGrades();
-            // adds all data to an array
-            $students[] = [
-                'class'=>"$class",
-                'gender'=>$gender,
-                'firstname'=>$firstname,
-                'lastname'=>$data['lastnames'][random_int(0, count($data['lastnames'])-1)],
-                'grades'=> $grades,
-            ];
-        }
+    if (random_int(0, 1) == 0) {
+        $gender = 'M';
+        $firstname = $maleFirstnames[random_int(0, count($maleFirstnames)-1)];
     }
-    return $students;
+    else {
+        $gender = 'F';
+        $firstname = $femaleFirstnames[random_int(0, count($femaleFirstnames)-1)];
+    }
+    return [
+        'gender'=>$gender,
+        'firstname'=>$firstname,
+        'lastname'=>$data['lastnames'][random_int(0, count($data['lastnames'])-1)],
+    ];
 }
-function getGrades() {
-    $subjects = $_SESSION['data']['subjects'];
-
-    // generate random number of grades between 1-5 for each subject
-    foreach ($subjects as $subject) {
-        if (random_int(0, 5) != 0) {
-            for ($i = 0; $i < random_int(1, 5); $i++) {
-                $grades[$subject][] = random_int(1, 5);
-            }
-        }
-        // if zero grades are to be generated
-        else $grades[$subject][] = "";
+function generateGrades() {
+    for ($i = 0; $i < random_int(3, 5); $i++) {
+        $grades[] = random_int(1, 5);
     }
     return $grades;
 }
 
-function getAllStudents()
-{
-    $mysqli = new mysqli("localhost", "root", "");
-    $mysqli->query("USE classroom;");
-
-    // returns (student_id, firstname, lastname, gender, class) as assoc array
-    $allStudents = $mysqli->query("SELECT s.id, s.firstname, s.lastname, s.gender, c.class_name
-                          FROM students s
-                          JOIN classes c
-                          ON s.class_id=c.id;
-    ");
+/*
+function getStudentAvg($id) {
+    $mysqli = getConn($_SESSION['database']);
+    $res = $mysqli->query("SELECT ROUND(AVG(grade), 2) as 'avg'  FROM `grades` WHERE student_id=$id;");
     $mysqli->close();
-    return $allStudents;
-}
+
+    return $res->fetch_assoc()['avg'];
+}*/

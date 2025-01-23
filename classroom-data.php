@@ -4,7 +4,6 @@
 *
 * Array usage practice
 */
-
 const DATA = [
     'lastnames' => [
         'Major',
