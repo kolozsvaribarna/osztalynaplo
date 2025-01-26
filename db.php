@@ -99,6 +99,7 @@ function uploadDB() {
     $mysqli->close();
 }
 
+/* functions using the database */
 function getStudentsFromDB($class) {
     $mysqli = new mysqli(SERVER, USERNAME, PASSWORD, DATABASE);
     $res = $mysqli->query("SELECT s.id as id, s.firstname as firstname, s.lastname as lastname, s.gender as gender, class_name as class
@@ -116,10 +117,58 @@ function getSubjectsFromDB() {
 }
 function getSubjectGrades($studentID, $subjectID) {
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
-
-    return $mysqli->query("SELECT g.grade
-                                        FROM grades g
-                                        JOIN students st ON g.student_id = st.id
-                                        JOIN subjects su ON g.subject_id = su.id
-                                        WHERE g.student_id=$studentID AND g.subject_id=$subjectID;");
+    $res = $mysqli->query("SELECT g.grade
+                                FROM grades g
+                                JOIN students st ON g.student_id = st.id
+                                JOIN subjects su ON g.subject_id = su.id
+                                WHERE g.student_id=$studentID AND g.subject_id=$subjectID;");
+    $mysqli->close();
+    return $res;
 }
+function getStudentAvg($id) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT ROUND(AVG(grade), 2) as 'avg'  FROM `grades` WHERE student_id=$id;");
+    $mysqli->close();
+    return $res->fetch_assoc()['avg'];
+}
+function getClassIdFromDB($class) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT id FROM classes WHERE class_name='$class';")->fetch_assoc()['id'];
+    $mysqli->close();
+    return $res;
+}
+function getSubjectAvg($classID, $subjectID) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT ROUND(AVG(grades.grade), 2) as 'avg' 
+                                FROM students
+                                JOIN grades ON grades.student_id=students.id
+                                WHERE grades.subject_id=$subjectID AND students.class_id=$classID;")
+                  ->fetch_assoc()['avg'];
+    $mysqli->close();
+    return $res;
+}
+function getClassAvg($classID) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT ROUND(AVG(grades.grade), 2) as 'avg' 
+                                FROM grades
+                                JOIN students ON grades.student_id=students.id
+                                JOIN classes ON students.class_id=classes.id
+                                WHERE students.class_id=$classID;")
+        ->fetch_assoc()['avg'];
+    $mysqli->close();
+    return $res;
+}
+function getSubjectAvgsSchool() {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $subjects = $mysqli->query("SELECT subject_name as name, id FROM subjects;");
+    foreach ($subjects as $subject) {
+        $avgs[] = $mysqli->query("SELECT ROUND(AVG(grades.grade), 2) as 'avg' FROM grades
+                                            WHERE grades.subject_id=".$subject['id'].";")->fetch_assoc()['avg'];
+    }
+    mysqli_close($mysqli);
+    return $avgs;
+}
+/*
+- tanulók rangsorolása iskolai és osztály szinten, tantárgyanként és összesítve, kiemelve a 3 legjobb és a 3 leggyengébb tanulót
+- a legjobb és a leggyengébb osztály összesen és tantárgyanként
+*/

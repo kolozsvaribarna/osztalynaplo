@@ -15,20 +15,20 @@ function htmlHead() {
         <title>Classroom</title>
     </head>";
 }
-
 function htmlStart() { echo "<body>"; }
 function htmlEnd() { echo "</body></html>"; }
 function displayNav() {
-    showClassListNav();
-
     if (DBexists($_SESSION['database'])) {
-        echo "<p class='msg-error msg-right'>No active database connection!</p>";
+        echo "<div class='msg-error msg-right'>No active database connection!</div>";
         echo "<form method='GET'><input type='submit' class='btn btn-save' value='Create database' name='initDB'></form>";
+        return;
     }
     else {
-        echo "<p class='msg msg-right'>Connected to '" . DATABASE . "'</p>";
+        echo "<div class='msg msg-right'>Connected to '" . DATABASE . "'</div>";
         echo "<form method='GET'><input type='submit' class='btn btn-reset btn-right' value='Drop database' name='dropDB'></form>";
     }
+    showClassListNav();
+
 }
 function showClassListNav() {
     $classes = $_SESSION['data']['classes'];
@@ -38,61 +38,69 @@ function showClassListNav() {
     foreach ($classes as $class) {
         echo "<input class='btn' type='submit' name='class' value='$class'>";
     }
-    //echo "<input class='btn btn-query' type='submit' name='statistics' value='Statistics'>";
-
-    if (isset($_GET['statistics'])) showStatisticsForm();
+    echo "<input class='btn btn-query' type='submit' name='statistics' value='Statistics'>";
 }
-
 function showStatisticsForm() {
-    echo "<form method='GET' action='$_SERVER[PHP_SELF]'>
-        <input class='btn btn-query' type='submit' name='statistic' value='Subject Averages'>
-        <input class='btn btn-query' type='submit' name='statistic' value='Student Rankings'>
-        <input class='btn btn-query' type='submit' name='statistic' value='Class Rankings'>
-        ";
-    // get requests for queries go here
-    echo "</form>";
+    echo "<form method='GET'>
+        <input class='btn btn-query' type='submit' name='statistics' value='Subject Averages'>
+        <input class='btn btn-query' type='submit' name='statistics' value='Student Rankings'>
+        <input class='btn btn-query' type='submit' name='statistics' value='Class Rankings'></form>";
 }
 
 function displayTable($class) {
     $students = getStudentsFromDB($class);
     $subjects = getSubjectsFromDB();
+    $classID = getClassIdFromDB($class);
 
     // header
-    echo "<table><tr><td class='table-class bold'>$class</td>";
+    echo "<table class='class-table'><tr><td class='table-class bold'>$class</td>";
     foreach ($subjects as $subject) {
         echo "<td class='bold'>".$subject['name']."</td>";
     }
-    echo "<td class='bold'>Average</td>";
+    echo "<td class='td-invisible'></td>";
     echo "</tr>";
 
     $i = 1;
     foreach ($students as $student) {
-        // display student's index, full name, gender
         echo "<tr><td class='bold first-col'>$i. ".$student["lastname"]." ".$student["firstname"]." (".$student["gender"].")</td>";
         $i++;
 
-        // display student's grades and calculate average
         $gradesAvg = [];
         foreach ($subjects as $subject) {
             $grades = getSubjectGrades($student['id'], $subject['id']);
 
-            // TODO test if grades is empty
             if (count($grades->fetch_assoc()) > 0)
             {
                 echo "<td>";
                 foreach ($grades as $grade)
                 {
-                    if ($grade['grade'] != 0)
-                    {
-                        $gradesAvg[] = $grade['grade'];
-                        echo $grade['grade'] ." ";
-                    }
+                    $gradesAvg[] = $grade['grade'];
+                    echo $grade['grade'] ." ";
                 }
                 echo "</td>";
             }
         }
-        echo "<td></td></tr>";
-        //echo "<td>". getStudentAvg($student['id']) ."</td></tr>";
+        echo "<td>". getStudentAvg($student['id']) ."</td></tr>";
     }
-    echo "</table>";
+    echo "<tr><td class='td-invisible'></td>";
+    foreach ($subjects as $subject) {
+        echo "<td>". getSubjectAvg($classID ,$subject['id'])."</td>";
+    }
+    echo "<td class='bold td-highlight'>".getClassAvg($classID)."</td>";
+    echo "</tr></table>";
+}
+function displaySubjectAverages() {
+    $subjects = getSubjectsFromDB();
+    $averages = getSubjectAvgsSchool();
+
+    echo "<h2>School Subject Averages</h2>";
+    echo "<table class='table-hover-disable'><tr><td class='table-title'>Subject</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$subject['name'],"</td>";
+    }
+    echo "</tr><tr><td class='table-title'>Average</td>";
+    foreach ($averages as $average) {
+        echo "<td>".$average."</td>";
+    }
+    echo "</tr></table>";
 }

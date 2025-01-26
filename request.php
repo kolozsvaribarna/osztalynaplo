@@ -6,7 +6,7 @@
 function requestHandle() {
 
     if (isset($_GET['initDB'])) {
-        Header("Location: index.php");
+        Header("Location: index.php?class=*");
         dropDB();
         createDB();
         uploadDB();
@@ -20,20 +20,34 @@ function requestHandle() {
         $class = $_GET['class'];
         $classes = $_SESSION['data']['classes'];
 
-        // every class selected
         if ($class == '*') {
             echo "<h2>All classes</h2>";
             foreach ($classes as $class) {
                 displayTable($class);
             }
         }
-        // single class selected
         elseif (in_array($class, $classes)) {
-            // TODO - FIX HEIGHT
-            echo "<h2>.</h2>";
             displayTable($class);
         }
         // class not found
         else echo "<p class='msg-error'>No class found</p>";
     }
+
+    if (isset($_GET['statistics'])) {
+        showStatisticsForm();
+        switch ($_GET['statistics']) {
+            case "Subject Averages":
+                displaySubjectAverages();
+                break;
+            case "Student Rankings":
+                echo "Student ranking";
+                break;
+            case "Class Rankings":
+                echo "Class ranking";
+                break;
+            default:
+                break;
+        }
+    }
+
 }

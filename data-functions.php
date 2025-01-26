@@ -27,12 +27,3 @@ function generateGrades() {
     }
     return $grades;
 }
-
-/*
-function getStudentAvg($id) {
-    $mysqli = getConn($_SESSION['database']);
-    $res = $mysqli->query("SELECT ROUND(AVG(grade), 2) as 'avg'  FROM `grades` WHERE student_id=$id;");
-    $mysqli->close();
-
-    return $res->fetch_assoc()['avg'];
-}*/

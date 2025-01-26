@@ -35,14 +35,17 @@
     font-weight: bold;
 }
 .msg-right {
+    display: block;
     text-align: right;
-    margin-right: 10px;
+    margin: 10px;
 }
-
 table {
     display: block;
     border-collapse: collapse;
     margin: 10px 0;
+}
+table.table-hover-disable {
+    pointer-events: none;
 }
 tr:nth-child(1), tr:nth-child(1):hover {
     background-color: unset;
@@ -52,12 +55,6 @@ tr:nth-child(2n), tr:nth-child(2n).hover-disable:hover {
 }
 tr:hover, tr:nth-child(2n):hover {
     background-color: lightcoral;
-}
-tr.best-class, tr.best-class:hover {
-    background-color: #BDE7BD;
-}
-tr.worst-class, tr.worst-class:hover {
-    background-color: #FFB6B3;
 }
 td {
     text-align: center;
@@ -91,6 +88,21 @@ td.table-class {
 td.table-title {
     padding: 5px;
     font-weight: bold;
+}
+td.td-invisible {
+    background-color: white;
+    border: none;
+}
+td.td-highlight {
+    font-weight: bold;
+    color: white;
+    background-color: #2F4F4F;
+}
+td.td-avg {
+    background-color: white;
+}
+table.class-table {
+    margin: 2vh 0 4vh 0;
 }
 h2, p {
     font-variant: small-caps;
