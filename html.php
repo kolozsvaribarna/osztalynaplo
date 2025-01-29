@@ -89,11 +89,9 @@ function displayTable($class) {
     echo "<td class='bold td-highlight'>".getClassAvg($classID)."</td>";
     echo "</tr></table>";
 }
-function displaySubjectAverages() {
-    $subjects = getSubjectsFromDB();
-    $averages = getSubjectAvgsSchool();
-
+function displaySubjectAverages($subjects, $averages) {
     echo "<h2>School Subject Averages</h2>";
+
     echo "<table class='table-hover-disable'><tr><td class='table-title'>Subject</td>";
     foreach ($subjects as $subject) {
         echo "<td class='bold'>".$subject['name'],"</td>";
@@ -101,6 +99,55 @@ function displaySubjectAverages() {
     echo "</tr><tr><td class='table-title'>Average</td>";
     foreach ($averages as $average) {
         echo "<td>".$average."</td>";
+    }
+    echo "</tr></table>";
+}
+
+function displayBestWorstClasses($classRank) {
+    echo "<h2>Cumulative</h2>";
+
+    echo "<table class='table-hover-disable'><tr><td class='table-title'>Class</td>";
+    foreach ($classRank as $class) {
+        echo "<td class='bold'>".$class['class']."</td>";
+    }
+    echo "</tr><tr><td>Avg</td>";
+    foreach ($classRank as $class) {
+        echo "<td>".$class['g_avg']."</td>";
+    }
+    echo "</tr></table>";
+}
+
+function displayBestWorstClassesBySubject($bestRanking, $worstRaking, $subjects) {
+
+    echo "<h2>By subject</h2><h3>Best</h3>";
+
+    echo "<table class='table-hover-disable'><tr><td class='table-title'>Subject</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$subject['name']."</td>";
+    }
+    echo "</tr><tr><td class='table-title'>Class</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$bestRanking[$subject['name']]['class']."</td>";
+    }
+    echo "</tr><tr><td class='table-title'>Average</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$bestRanking[$subject['name']]['avg_grade']."</td>";
+    }
+    echo "</tr></table>";
+
+    echo "<h3>Worst</h3>";
+
+    echo "<table class='table-hover-disable'><tr><td class='table-title'>Subject</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$subject['name']."</td>";
+    }
+    echo "</tr><tr><td class='table-title'>Class</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$worstRaking[$subject['name']]['class']."</td>";
+    }
+    echo "</tr><tr><td class='table-title'>Average</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$worstRaking[$subject['name']]['avg_grade']."</td>";
     }
     echo "</tr></table>";
 }

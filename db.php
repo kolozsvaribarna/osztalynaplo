@@ -168,7 +168,33 @@ function getSubjectAvgsSchool() {
     mysqli_close($mysqli);
     return $avgs;
 }
+function getClassRankingByAvg() {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT c.class_name as class, ROUND(AVG(g.grade), 2) AS g_avg
+                    FROM classes c
+                    JOIN students s ON c.id = s.class_id
+                    JOIN grades g ON s.id = g.student_id
+                    GROUP BY c.id, c.class_name
+                    ORDER BY g_avg DESC;");
+    $mysqli->close();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
+function getClassRakingBySubjectAverage($mode = "DESC") {
+    $subjects = getSubjectsFromDB();
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    foreach ($subjects as $subject) {
+        $res[$subject['name']] = $mysqli->query("SELECT c.class_name as class, ROUND(AVG(g.grade), 2) AS avg_grade
+                                            FROM classes c
+                                            JOIN students s ON c.id = s.class_id
+                                            JOIN grades g ON s.id = g.student_id
+                                            WHERE g.subject_id = ".$subject['id']."
+                                            GROUP BY c.id, c.class_name
+                                            ORDER BY avg_grade ".$mode."
+                                            LIMIT 1;")->fetch_assoc();
+    }
+     $mysqli->close();
+     return $res;
+}
 /*
 - tanulók rangsorolása iskolai és osztály szinten, tantárgyanként és összesítve, kiemelve a 3 legjobb és a 3 leggyengébb tanulót
-- a legjobb és a leggyengébb osztály összesen és tantárgyanként
 */

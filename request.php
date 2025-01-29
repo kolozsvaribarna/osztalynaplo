@@ -37,17 +37,18 @@ function requestHandle() {
         showStatisticsForm();
         switch ($_GET['statistics']) {
             case "Subject Averages":
-                displaySubjectAverages();
+                displaySubjectAverages(getSubjectsFromDB(), getSubjectAvgsSchool());
                 break;
             case "Student Rankings":
                 echo "Student ranking";
                 break;
             case "Class Rankings":
-                echo "Class ranking";
+                echo "<h2>Best and worst classes</h2>";
+                displayBestWorstClasses(getClassRankingByAvg());
+                displayBestWorstClassesBySubject(getClassRakingBySubjectAverage(), getClassRakingBySubjectAverage("ASC"), getSubjectsFromDB());
                 break;
             default:
                 break;
         }
     }
-
 }
