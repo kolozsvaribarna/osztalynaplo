@@ -5,6 +5,12 @@
     user-select: none;
     font-family: Arial, Helvetica, sans-serif
 }
+select {
+    font-weight: bold;
+    padding: 5px 15px;
+    text-align: center;
+    cursor: pointer;
+}
 .btn {
     font-weight: bold;
     padding: 5px 15px;
@@ -60,9 +66,12 @@ td {
     text-align: center;
     vertical-align: middle;
     border: 1px black solid;
-    width: 9.5vw;
+    width: 9vw;
     height: 25px;
     text-transform: capitalize;
+}
+td.half-width {
+    width: 4vw;
 }
 td.bold {
     font-weight: bold;

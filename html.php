@@ -3,6 +3,7 @@
  * @author Kolozsvári Barnabás
  * desc: code responsible for the site's HTML
 */
+require_once "db.php";
 
 function htmlHead() {
     echo "
@@ -18,7 +19,7 @@ function htmlHead() {
 function htmlStart() { echo "<body>"; }
 function htmlEnd() { echo "</body></html>"; }
 function displayNav() {
-    if (DBexists($_SESSION['database'])) {
+    if (DBexists()) {
         echo "<div class='msg-error msg-right'>No active database connection!</div>";
         echo "<form method='GET'><input type='submit' class='btn btn-save' value='Create database' name='initDB'></form>";
         return;
@@ -28,17 +29,26 @@ function displayNav() {
         echo "<form method='GET'><input type='submit' class='btn btn-reset btn-right' value='Drop database' name='dropDB'></form>";
     }
     showClassListNav();
-
 }
 function showClassListNav() {
     $classes = $_SESSION['data']['classes'];
 
     echo "<form method='GET'>
-        <input class='btn' type='submit' name='class' value='*'>";
-    foreach ($classes as $class) {
-        echo "<input class='btn' type='submit' name='class' value='$class'>";
-    }
-    echo "<input class='btn btn-query' type='submit' name='statistics' value='Statistics'>";
+            <select name='year'>
+              <option value='' selected disabled hidden>Évfolyam</option>
+                <option value='2022' onselect=''>2022</option>
+                <option value='2023'>2023</option>
+                <option value='2024'>2024</option>
+            </select>";
+
+        echo "<input class='btn' type='submit' name='class' value='*'>";
+        foreach ($classes as $class) {
+            echo "<input class='btn' type='submit' name='class' value='$class'>";
+        }
+
+    echo "</form>";
+
+    //echo "<form method='GET'><input class='btn btn-query' type='submit' name='statistics' value='Statistics'></form>";
 }
 function showStatisticsForm() {
     echo "<form method='GET'>
@@ -47,46 +57,42 @@ function showStatisticsForm() {
         <input class='btn btn-query' type='submit' name='statistics' value='Class Rankings'></form>";
 }
 
-function displayTable($class) {
-    $students = getStudentsFromDB($class);
+function displayTable($class, $year) {
     $subjects = getSubjectsFromDB();
-    $classID = getClassIdFromDB($class);
+    $classID = getClassIdFromDB($class, $year)->fetch_assoc()['id'];
+    $students = getStudentsFromDB($classID);
 
     // header
     echo "<table class='class-table'><tr><td class='table-class bold'>$class</td>";
     foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$subject['name']."</td>";
+        echo "<td class='bold' colspan='2'>".$subject['name']."</td>";
     }
-    echo "<td class='td-invisible'></td>";
+    echo "<td class='bold'>Average</td>";
     echo "</tr>";
 
     $i = 1;
     foreach ($students as $student) {
-        echo "<tr><td class='bold first-col'>$i. ".$student["lastname"]." ".$student["firstname"]." (".$student["gender"].")</td>";
+        echo "<tr><td class='bold first-col'>$i. ".$student["name"]." (".$student["gender"].")</td>";
         $i++;
 
-        $gradesAvg = [];
         foreach ($subjects as $subject) {
             $grades = getSubjectGrades($student['id'], $subject['id']);
-
-            if (count($grades->fetch_assoc()) > 0)
+            echo "<td>";
+            foreach ($grades as $grade)
             {
-                echo "<td>";
-                foreach ($grades as $grade)
-                {
-                    $gradesAvg[] = $grade['grade'];
-                    echo $grade['grade'] ." ";
-                }
-                echo "</td>";
+                echo $grade['grade'] ." ";
             }
+            echo "</td>";
+
+            echo "<td class='italic half-width'>".getStudentAvgBySubject($student['id'], $subject['id'])."</td>";
         }
-        echo "<td>". getStudentAvg($student['id']) ."</td></tr>";
+        echo "<td class='half-width italic'>". getStudentAvg($student['id']) ."</td></tr>";
     }
     echo "<tr><td class='td-invisible'></td>";
     foreach ($subjects as $subject) {
-        echo "<td>". getSubjectAvg($classID ,$subject['id'])."</td>";
+        echo "<td colspan='2'>". getSubjectAvg($classID ,$subject['id'])."</td>";
     }
-    echo "<td class='bold td-highlight'>".getClassAvg($classID)."</td>";
+    echo "<td class='bold td-highlight italic'>".getClassAvg($classID)."</td>";
     echo "</tr></table>";
 }
 function displaySubjectAverages($subjects, $averages) {
@@ -150,4 +156,37 @@ function displayBestWorstClassesBySubject($bestRanking, $worstRaking, $subjects)
         echo "<td class='bold'>".$worstRaking[$subject['name']]['avg_grade']."</td>";
     }
     echo "</tr></table>";
+}
+
+function displayStudentRanking() {
+    $subjects = getSubjectsFromDB();
+
+    echo "<h2>Student Ranking</h2>";
+    echo "<table class=''><tr><td class='bold'>Rank</td>";
+    foreach ($subjects as $subject) {
+        echo "<td class='bold'>".$subject['name']."</td>";
+    }
+    echo "<td class='bold'>Cumulative</td>";
+    echo "</tr>";
+
+    // TODO - CUMULATIVE VALUE CHECK
+    $cumulativeTopFive = getCumulativeStudentRanking();
+    for ($i = 1; $i <= 5; $i++) {
+        echo "<tr><td class='bold'>$i.</td>";
+        foreach ($subjects as $subject) {
+            $topFive = getStudentRanking($subject['id']);
+            if (isset($topFive[$i - 1])) {
+                $student = $topFive[$i - 1];
+                echo "<td>".$student['name']." ".$student['avg']."</td>";
+            }
+        }
+
+        if (isset($cumulativeTopFive[$i - 1])) {
+            $cumulative = $cumulativeTopFive[$i - 1];
+            echo "<td>".$cumulative['name']." (".$cumulative['avg'].")</td>";
+        }
+        echo "</tr>";
+    }
+
+    echo "</table>";
 }

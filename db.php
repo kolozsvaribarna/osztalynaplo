@@ -7,7 +7,7 @@ session_start();
 
 const SERVER = "localhost";
 const USERNAME = "root";
-const PASSWORD = "";
+const PASSWORD = "admin";
 const DATABASE = "classroom";
 
 $_SESSION['data'] = $_SESSION['data'] ?? getData();
@@ -25,15 +25,15 @@ function dropDB($dbName = DATABASE) {
     $mysqli->close();
 }
 function createDB() {
-    dropDB();
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD);
-    $mysqli->query("CREATE DATABASE " . DATABASE . " CHARACTER SET utf8 COLLATE UTF8_HUNGARIAN_CI;");
-    $mysqli->query("USE " . DATABASE. ";");
+    $mysqli->query("CREATE DATABASE " . DATABASE . " ;");
+    $mysqli->query("USE " . DATABASE. " ;");
 
     // CLASSES TABLE
     $mysqli->query("CREATE TABLE classes (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    class_name VARCHAR(3) NOT NULL);");
+                    class_name VARCHAR(3) NOT NULL,
+                    year INT NOT NULL);");
 
     // SUBJECTS TABLE
     $mysqli->query("CREATE TABLE subjects (
@@ -56,17 +56,19 @@ function createDB() {
                     date DATE);");
 
     $mysqli->close();
+    uploadDB();
 }
 function uploadDB() {
-    if (!dbExists()) {
-        createDB();
-    }
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
     $mysqli->query("USE " . DATABASE .";");
 
     // CLASSES TABLE
-    foreach ($_SESSION['data']['classes'] as $class) {
-        $mysqli->query("INSERT INTO classes (class_name) VALUES ('$class');");
+    $year = 2022;
+    for ($i = 0; $i < 3; $i++) {
+        foreach ($_SESSION['data']['classes'] as $class) {
+            $mysqli->query("INSERT INTO classes (class_name, year) VALUES ('$class', '$year');");
+        }
+        $year++;
     }
 
     // SUBJECTS TABLE
@@ -75,11 +77,12 @@ function uploadDB() {
     }
 
     // STUDENTS TABLE
-    foreach ($mysqli->query("SELECT class_name, id FROM classes;") as $class) {
+    $classes = $mysqli->query("SELECT class_name, year, id FROM classes;")->fetch_all(MYSQLI_ASSOC);
+    foreach ($classes as $class) {
         for ($i = 0; $i < random_int(10, 15); $i++) {
             $student = generateSingleStudent();
             $mysqli->query("INSERT INTO students (class_id, firstname, lastname, gender)
-                    VALUES ('".$class["id"]."','".$student['firstname']."','".$student['lastname']."','".$student['gender']."');");
+                VALUES ('".$class["id"]."','".$student['firstname']."','".$student['lastname']."','".$student['gender']."');");
         }
     }
 
@@ -90,7 +93,7 @@ function uploadDB() {
     for ($i = 0; $i < $studentCount; $i++) {
         for ($j = 0; $j < $subjectsCount; $j++) {
             foreach(generateGrades() as $grade) {
-                $date = "2025-".random_int(1, 12)."-".random_int(1, 30);
+                $date = "202".random_int(3, 4)."-".random_int(1, 12)."-".random_int(1, 30);
                 $mysqli->query("INSERT INTO grades (student_id, subject_id, grade, date)
                                                 VALUES ('". $i + 1 ."', '".$j+1 ."', '$grade', '$date');");
             }
@@ -100,12 +103,13 @@ function uploadDB() {
 }
 
 /* functions using the database */
-function getStudentsFromDB($class) {
+function getStudentsFromDB($classID) {
     $mysqli = new mysqli(SERVER, USERNAME, PASSWORD, DATABASE);
-    $res = $mysqli->query("SELECT s.id as id, s.firstname as firstname, s.lastname as lastname, s.gender as gender, class_name as class
+    $res = $mysqli->query("SELECT s.id as id, CONCAT(lastname, ' ', firstname) as name, s.gender as gender, class_name as class
                                         FROM students s 
                                         JOIN classes c ON s.class_id = c.id 
-                                        WHERE c.class_name = '$class';");
+                                        WHERE s.class_id = $classID
+                                ORDER BY 2 ASC;");
     $mysqli->close();
     return $res;
 }
@@ -131,9 +135,18 @@ function getStudentAvg($id) {
     $mysqli->close();
     return $res->fetch_assoc()['avg'];
 }
-function getClassIdFromDB($class) {
+function getStudentAvgBySubject($id, $subjectID) {
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
-    $res = $mysqli->query("SELECT id FROM classes WHERE class_name='$class';")->fetch_assoc()['id'];
+    $res = $mysqli->query("SELECT ROUND(AVG(grades.grade), 2) as 'avg' 
+                                FROM students
+                                JOIN grades ON grades.student_id=students.id
+                                WHERE grades.subject_id=$subjectID AND students.id=$id;")
+        ->fetch_assoc()['avg'];
+    return $res;
+}
+function getClassIdFromDB($class, $year) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT id FROM classes WHERE class_name= '$class' AND `year` = $year ;");
     $mysqli->close();
     return $res;
 }
@@ -149,11 +162,11 @@ function getSubjectAvg($classID, $subjectID) {
 }
 function getClassAvg($classID) {
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
-    $res = $mysqli->query("SELECT ROUND(AVG(grades.grade), 2) as 'avg' 
+    $res = $mysqli->query("SELECT ROUND(AVG(grades.grade), 2) as 'avg'
                                 FROM grades
                                 JOIN students ON grades.student_id=students.id
                                 JOIN classes ON students.class_id=classes.id
-                                WHERE students.class_id=$classID;")
+                                WHERE students.class_id=$classID ;")
         ->fetch_assoc()['avg'];
     $mysqli->close();
     return $res;
@@ -194,6 +207,33 @@ function getClassRakingBySubjectAverage($mode = "DESC") {
     }
      $mysqli->close();
      return $res;
+}
+
+function getStudentRanking($subjectID, $mode = "DESC") {
+     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+     $res = $mysqli->query("SELECT ROUND(AVG(g.grade), 2) as avg, CONCAT(s.lastname, ' ', s.firstname) as name, c.class_name as class
+                                FROM students s
+                                	JOIN classes c ON s.class_id = c.id
+                                    JOIN grades g ON g.student_id = s.id
+                                    JOIN subjects su ON g.subject_id = su.id
+                                WHERE su.id = ".$subjectID."
+                                GROUP BY 2
+                                ORDER BY 1 $mode
+                                LIMIT 5;")->fetch_all(MYSQLI_ASSOC);
+     $mysqli->close();
+     return $res;
+}
+function getCumulativeStudentRanking($mode = "DESC") {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT ROUND(AVG(g.grade), 2) as avg, CONCAT(s.lastname, ' ', s.firstname) as name, c.class_name as class
+                                FROM students s
+                                	JOIN classes c ON s.class_id = c.id
+                                    JOIN grades g ON g.student_id = s.id
+                                GROUP BY 2
+                                ORDER BY 1 $mode
+                                LIMIT 5;")->fetch_all(MYSQLI_ASSOC);
+    $mysqli->close();
+    return $res;
 }
 /*
 - tanulók rangsorolása iskolai és osztály szinten, tantárgyanként és összesítve, kiemelve a 3 legjobb és a 3 leggyengébb tanulót
