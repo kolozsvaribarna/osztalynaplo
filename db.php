@@ -181,60 +181,49 @@ function getSubjectAvgsSchool() {
     mysqli_close($mysqli);
     return $avgs;
 }
-function getClassRankingByAvg() {
+
+function getBestClassID() {
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
-    $res = $mysqli->query("SELECT c.class_name as class, ROUND(AVG(g.grade), 2) AS g_avg
-                    FROM classes c
-                    JOIN students s ON c.id = s.class_id
-                    JOIN grades g ON s.id = g.student_id
-                    GROUP BY c.id, c.class_name
-                    ORDER BY g_avg DESC;");
+    $res = $mysqli->query("SELECT c.id
+FROM classes c JOIN students s ON s.class_id = c.id
+JOIN grades g ON g.student_id = s.id
+GROUP BY c.class_name, c.year
+ORDER BY AVG(g.grade) DESC
+LIMIT 1;");
+    $mysqli->close();
+    return $res->fetch_assoc()['id'];
+}
+function getBestClass($id = null) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    if (!$id) {
+        $id = getBestClassID();
+    }
+    $res = $mysqli->query("SELECT class_name as class, `year` FROM classes WHERE id = $id;");
+    $mysqli->close();
+    return $res->fetch_assoc();
+}
+
+function get10BestStudents() {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT CONCAT(s.lastname, ' ', s.firstname) as name, c.class_name as class, c.year, ROUND(AVG(g.grade), 2) as avg
+FROM students s JOIN grades g ON g.student_id = s.id JOIN classes c ON s.class_id = c.id
+GROUP BY 1
+ORDER BY AVG(g.grade) DESC
+LIMIT 10
+;");
     $mysqli->close();
     return $res->fetch_all(MYSQLI_ASSOC);
 }
-function getClassRakingBySubjectAverage($mode = "DESC") {
-    $subjects = getSubjectsFromDB();
-    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
-    foreach ($subjects as $subject) {
-        $res[$subject['name']] = $mysqli->query("SELECT c.class_name as class, ROUND(AVG(g.grade), 2) AS avg_grade
-                                            FROM classes c
-                                            JOIN students s ON c.id = s.class_id
-                                            JOIN grades g ON s.id = g.student_id
-                                            WHERE g.subject_id = ".$subject['id']."
-                                            GROUP BY c.id, c.class_name
-                                            ORDER BY avg_grade ".$mode."
-                                            LIMIT 1;")->fetch_assoc();
-    }
-     $mysqli->close();
-     return $res;
-}
 
-function getStudentRanking($subjectID, $mode = "DESC") {
-     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
-     $res = $mysqli->query("SELECT ROUND(AVG(g.grade), 2) as avg, CONCAT(s.lastname, ' ', s.firstname) as name, c.class_name as class
-                                FROM students s
-                                	JOIN classes c ON s.class_id = c.id
-                                    JOIN grades g ON g.student_id = s.id
-                                    JOIN subjects su ON g.subject_id = su.id
-                                WHERE su.id = ".$subjectID."
-                                GROUP BY 2
-                                ORDER BY 1 $mode
-                                LIMIT 5;")->fetch_all(MYSQLI_ASSOC);
-     $mysqli->close();
-     return $res;
-}
-function getCumulativeStudentRanking($mode = "DESC") {
+function get10BestStudentsByYear($year) {
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
-    $res = $mysqli->query("SELECT ROUND(AVG(g.grade), 2) as avg, CONCAT(s.lastname, ' ', s.firstname) as name, c.class_name as class
-                                FROM students s
-                                	JOIN classes c ON s.class_id = c.id
-                                    JOIN grades g ON g.student_id = s.id
-                                GROUP BY 2
-                                ORDER BY 1 $mode
-                                LIMIT 5;")->fetch_all(MYSQLI_ASSOC);
+    $res = $mysqli->query("SELECT CONCAT(s.lastname, ' ', s.firstname) as name, c.class_name as class, ROUND(AVG(g.grade), 2) as avg
+FROM students s JOIN grades g ON g.student_id = s.id JOIN classes c ON s.class_id = c.id
+WHERE c.year = $year
+GROUP BY 1
+ORDER BY AVG(g.grade) DESC
+LIMIT 10
+;");
     $mysqli->close();
-    return $res;
+    return $res->fetch_all(MYSQLI_ASSOC);
 }
-/*
-- tanulók rangsorolása iskolai és osztály szinten, tantárgyanként és összesítve, kiemelve a 3 legjobb és a 3 leggyengébb tanulót
-*/

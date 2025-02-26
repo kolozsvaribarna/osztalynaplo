@@ -48,15 +48,13 @@ function showClassListNav() {
 
     echo "</form>";
 
-    //echo "<form method='GET'><input class='btn btn-query' type='submit' name='statistics' value='Statistics'></form>";
+    echo "<form method='GET'><input class='btn btn-query' type='submit' name='statistics' value='Statistics'></form>";
 }
 function showStatisticsForm() {
     echo "<form method='GET'>
-        <input class='btn btn-query' type='submit' name='statistics' value='Subject Averages'>
-        <input class='btn btn-query' type='submit' name='statistics' value='Student Rankings'>
-        <input class='btn btn-query' type='submit' name='statistics' value='Class Rankings'></form>";
+        <input class='btn btn-query' type='submit' name='statistics' value='Hall of Fame'>
+        <input class='btn btn-query' type='submit' name='statistics' value='Best students by year'></form>";
 }
-
 function displayTable($class, $year) {
     $subjects = getSubjectsFromDB();
     $classID = getClassIdFromDB($class, $year)->fetch_assoc()['id'];
@@ -95,98 +93,36 @@ function displayTable($class, $year) {
     echo "<td class='bold td-highlight italic'>".getClassAvg($classID)."</td>";
     echo "</tr></table>";
 }
-function displaySubjectAverages($subjects, $averages) {
-    echo "<h2>School Subject Averages</h2>";
 
-    echo "<table class='table-hover-disable'><tr><td class='table-title'>Subject</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$subject['name'],"</td>";
+function displayHallOfFame() {
+    $bestClass = getBestClass();
+    $students = get10BestStudents();
+
+    echo "<h2>Hall of Fame</h2>";
+
+    echo "<h3>Best class of all time: ".$bestClass['class']." (".$bestClass['year'].")</h3>";
+
+    echo "<h3>Best 10 students</h3>";
+    echo "<table class='class-table'><tr><td>Name</td><td>Class</td><td>Year</td><td>Average</td></tr>";
+    $i = 1;
+    foreach ($students as $student) {
+        echo "<tr><td class='first-col'>$i. ".$student['name']."</td><td>".$student['class']."</td><td>".$student['year']."</td><td class='italic'>".$student['avg']."</td></tr>";
+        $i++;
     }
-    echo "</tr><tr><td class='table-title'>Average</td>";
-    foreach ($averages as $average) {
-        echo "<td>".$average."</td>";
-    }
-    echo "</tr></table>";
-}
-
-function displayBestWorstClasses($classRank) {
-    echo "<h2>Cumulative</h2>";
-
-    echo "<table class='table-hover-disable'><tr><td class='table-title'>Class</td>";
-    foreach ($classRank as $class) {
-        echo "<td class='bold'>".$class['class']."</td>";
-    }
-    echo "</tr><tr><td>Avg</td>";
-    foreach ($classRank as $class) {
-        echo "<td>".$class['g_avg']."</td>";
-    }
-    echo "</tr></table>";
-}
-
-function displayBestWorstClassesBySubject($bestRanking, $worstRaking, $subjects) {
-
-    echo "<h2>By subject</h2><h3>Best</h3>";
-
-    echo "<table class='table-hover-disable'><tr><td class='table-title'>Subject</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$subject['name']."</td>";
-    }
-    echo "</tr><tr><td class='table-title'>Class</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$bestRanking[$subject['name']]['class']."</td>";
-    }
-    echo "</tr><tr><td class='table-title'>Average</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$bestRanking[$subject['name']]['avg_grade']."</td>";
-    }
-    echo "</tr></table>";
-
-    echo "<h3>Worst</h3>";
-
-    echo "<table class='table-hover-disable'><tr><td class='table-title'>Subject</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$subject['name']."</td>";
-    }
-    echo "</tr><tr><td class='table-title'>Class</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$worstRaking[$subject['name']]['class']."</td>";
-    }
-    echo "</tr><tr><td class='table-title'>Average</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$worstRaking[$subject['name']]['avg_grade']."</td>";
-    }
-    echo "</tr></table>";
-}
-
-function displayStudentRanking() {
-    $subjects = getSubjectsFromDB();
-
-    echo "<h2>Student Ranking</h2>";
-    echo "<table class=''><tr><td class='bold'>Rank</td>";
-    foreach ($subjects as $subject) {
-        echo "<td class='bold'>".$subject['name']."</td>";
-    }
-    echo "<td class='bold'>Cumulative</td>";
-    echo "</tr>";
-
-    // TODO - CUMULATIVE VALUE CHECK
-    $cumulativeTopFive = getCumulativeStudentRanking();
-    for ($i = 1; $i <= 5; $i++) {
-        echo "<tr><td class='bold'>$i.</td>";
-        foreach ($subjects as $subject) {
-            $topFive = getStudentRanking($subject['id']);
-            if (isset($topFive[$i - 1])) {
-                $student = $topFive[$i - 1];
-                echo "<td>".$student['name']." ".$student['avg']."</td>";
-            }
-        }
-
-        if (isset($cumulativeTopFive[$i - 1])) {
-            $cumulative = $cumulativeTopFive[$i - 1];
-            echo "<td>".$cumulative['name']." (".$cumulative['avg'].")</td>";
-        }
-        echo "</tr>";
-    }
-
     echo "</table>";
+}
+
+function displayBest10StudentsByYear() {
+    $years = [2022, 2023, 2024];
+    foreach ($years as $year) {
+        $students = get10BestStudentsByYear($year);
+        echo "<h3>$year</h3>";
+        echo "<table class='class-table'><tr><td>Name</td><td>Class</td><td>Average</td></tr>";
+        $i = 1;
+        foreach ($students as $student) {
+            echo "<tr><td class='first-col'>$i. ".$student['name']."</td><td>".$student['class']."</td><td class='italic'>".$student['avg']."</td></tr>";
+            $i++;
+        }
+        echo "</table>";
+    }
 }

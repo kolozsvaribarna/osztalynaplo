@@ -36,16 +36,11 @@ function requestHandle() {
     if (isset($_GET['statistics'])) {
         showStatisticsForm();
         switch ($_GET['statistics']) {
-            case "Subject Averages":
-                displaySubjectAverages(getSubjectsFromDB(), getSubjectAvgsSchool());
+            case "Hall of Fame":
+                displayHallOfFame();
                 break;
-            case "Student Rankings":
-                displayStudentRanking();
-                break;
-            case "Class Rankings":
-                echo "<h2>Best and worst classes</h2>";
-                displayBestWorstClasses(getClassRankingByAvg());
-                displayBestWorstClassesBySubject(getClassRakingBySubjectAverage(), getClassRakingBySubjectAverage("ASC"), getSubjectsFromDB());
+            case "Best students by year":
+                displayBest10StudentsByYear();
                 break;
             default:
                 break;
