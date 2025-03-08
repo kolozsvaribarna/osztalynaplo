@@ -1,5 +1,5 @@
 <?php
-
+require_once "db.php";
 function htmlHead() {
     echo "
     <!DOCTYPE html>
@@ -16,7 +16,7 @@ function htmlStart() { echo "<body>"; }
 function htmlEnd() { echo "</body></html>"; }
 function displayReturnMainBtn() {
     echo "<form method='POST'>
-        <input class='btn btn-query' type='submit' name='return' value='Return to main'></form>";
+        <input class='btn btn-query' type='submit' name='return' value='Return to main'></form><br>";
 }
 function displayEditCategoriesForm() {
     echo "<form method='POST'>
@@ -34,6 +34,21 @@ function displaySubjectEdit() {
     displaySubjectEditTable($subjects);
 }
 
+function showClassListNav() {
+    $classes = getClassesFromDB();
+    echo "<br><form method='POST' action='admin.php'>
+            <select name='year'>
+              <option value='' selected disabled hidden>Évfolyam</option>
+                <option value='2022' onselect=''>2022</option>
+                <option value='2023'>2023</option>
+                <option value='2024'>2024</option>
+            </select>";
+
+    foreach ($classes as $class) {
+        echo "<input class='btn' type='submit' name='class' value='" . $class[0] . "'>";
+    }
+    echo "</form>";
+}
 function displayClassEditTable($classes) {
     echo "<form method='POST'><table><tr><td>#</td><td>Class</td><td>Year</td><td class='td-invisible' colspan='2'><button type='submit' name='btn-add-class' value='add' class='btn-save btn-add-class'><i class='fa fa-plus' aria-hidden='true'></i></button></td></tr>";
     foreach ($classes as $class_) {
@@ -67,6 +82,43 @@ function displaySubjectEditTable($subjects) {
         </td></tr>";
     }
     echo "</table></form>";
+}
+function displayEditStudentForm($studentData) {
+    $id = $studentData[0]['id'];
+    $firstName = $studentData[0]['firstName'];
+    $lastName = $studentData[0]['lastName'];
+    $class = $studentData[0]['class'];
+    $gender = $studentData[0]['gender'];
+
+    echo "<form method='POST'>
+    <section style='border: 1px solid black; border-radius: 10px; width: fit-content; padding: 30px; margin: 0 auto;'>
+        <label for='studentID'>#</label>
+        <input type='text' name='studentID' value='$id' readonly>
+        <label for='class'>Class:</label>
+        <input type='text' name='class' value='$class' readonly>  
+        <label for='firstname'>Firstname:</label>
+        <input type='text' name='firstname' value='$firstName'>   
+        <label for='lastname'>Lastname:</label>
+        <input type='text' name='lastname' value='$lastName'>
+        <label for='gender'>Gender:</label>";
+        if ($gender == "M") { echo "
+            <label for='g1'>M</label>
+            <input type='radio' id='g1' name='gender' value='M' checked>
+            <input type='radio' id='g2' name='gender' value='F'>
+            <label for='g2'>F</label>";
+        }
+        else { echo "
+            <label for='g1'>M</label>
+            <input type='radio' id='g1' name='gender' value='M'>
+            <input type='radio' id='g2' name='gender' value='F' checked>
+            <label for='g2'>F</label>";
+        }
+        echo "</section>
+        <section style='border: 1px solid black; border-radius: 10px; width: fit-content; padding: 30px; margin: 15px auto;'>
+            <input class='btn btn-save' type='submit' name='edit-student-form' value='OK'>
+            <input class='btn btn-reset' type='submit' name='edit-student-form' value='Cancel'>
+        </section>
+        </form>";
 }
 function displayEditClassForm($classData) {
     $id = $classData[0]["id"];
@@ -139,6 +191,35 @@ function displayAddSubjectForm() {
     </form>";
 }
 
+function displayAddStudentForm() {
+    $class = $_SESSION["class"];
+    $year = $_SESSION["year"];
+
+    echo "<form method='POST'>
+    <section style='border: 1px solid black; border-radius: 10px; width: fit-content; padding: 30px; margin: 0 auto;'>
+        <label for='studentID'>#</label>
+        <input type='text' name='studentID' value='' readonly>
+        <label for='class'>Class:</label>
+        <input type='text' name='class' value='$class' readonly>  
+        <label for='year'>Year:</label>
+        <input type='text' name='year' value='$year' readonly>
+        <label for='firstname'>Firstname:</label>
+        <input type='text' name='firstname' value=''>   
+        <label for='lastname'>Lastname:</label>
+        <input type='text' name='lastname' value=''>
+        <label for='gender'>Gender:</label>
+        <label for='g1'>M</label>
+        <input type='radio' id='g1' name='gender' value='M'>
+        <input type='radio' id='g2' name='gender' value='F'>
+        <label for='g2'>F</label>
+    </section>
+    <section style='border: 1px solid black; border-radius: 10px; width: fit-content; padding: 30px; margin: 15px auto;'>
+        <input class='btn btn-save' type='submit' name='add-student-form' value='OK'>
+        <input class='btn btn-reset' type='submit' name='add-student-form' value='Cancel'>
+    </section>
+    </form>";
+}
+
 function redirectToAdmin($category) {
     echo '<form id="redirectForm" action="admin.php" method="POST">';
     echo "<input type='hidden' name='edit_category' value='$category'>";
@@ -148,4 +229,22 @@ function redirectToAdmin($category) {
     echo '</form>';
     echo '<script>document.getElementById("redirectForm").submit();</script>';
     exit;
+}
+function displayClassTable($class, $year) {
+    $classID = getClassIdFromDB($class, $year)->fetch_assoc()['id'];
+    $students = getStudentsFromDB($classID);
+
+    echo "<h2>$class - $year</h2>";
+    echo "<form method='POST'><table class='class-table'><tr><td>#</td><td>name</td><td class='td-invisible min-width' colspan='2'><button type='submit' name='btn-add-student' value='add' class='btn-save'><i class='fa fa-plus' aria-hidden='true'></i></button></td></tr>";
+    foreach ($students as $student) {
+        echo "<td>".$student['id']."</td><td>".$student["name"]." (".$student["gender"].")</td>
+            <td class='td-invisible min-width'>
+                <button type='submit' name='btn-edit-student' value='".$student['id']."' class='btn-query btn-edit'><i class='fa fa-pencil-square-o' aria-hidden='true'></i></button>
+            </td>
+            <td class='td-invisible min-width'>
+                <button type='submit' name='btn-delete-student' value='".$student['id']."' class='btn-reset btn-del'><i class='fa fa-trash' aria-hidden='true'></i></button>
+            </td>
+            <tr>";
+    }
+    echo "</table></form>";
 }

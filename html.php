@@ -47,11 +47,11 @@ function showClassListNav() {
         }
 
     echo "</form>";
-
-    echo "<form method='GET'><input class='btn btn-query' type='submit' name='statistics' value='Statistics'></form>";
+    echo "<br><form method='GET'><input class='btn btn-query' type='submit' name='statistics' value='Statistics'></form>";
 }
 function showStatisticsForm() {
-    echo "<form method='GET'>
+    echo "<br>
+        <form method='GET'>
         <input class='btn btn-query' type='submit' name='statistics' value='Hall of Fame'>
         <input class='btn btn-query' type='submit' name='statistics' value='Best students by year'></form>";
 }

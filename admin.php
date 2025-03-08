@@ -6,11 +6,10 @@ require_once "admin_request.php";
 
 htmlHead();
 htmlStart();
-echo "<h2>Admin page</h2>";
 displayReturnMainBtn();
 
-handle();
+echo "<h2>Admin page</h2>";
 
-if (!isset($_POST["edit_category"])) displayEditCategoriesForm();
+handle();
 
 htmlEnd();

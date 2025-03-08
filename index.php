@@ -14,5 +14,4 @@ displayAdminButton();
 displayNav();
 requestHandle();
 
-
 htmlEnd();

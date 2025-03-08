@@ -5,6 +5,10 @@ require_once "admin_html.php";
 
 function handle()
 {
+    if (!isset($_POST["edit_category"])) {
+        displayEditCategoriesForm();
+    }
+
     if (isset($_POST["return"])) {
         echo "return";
         header("Location: index.php");
@@ -17,7 +21,7 @@ function handle()
                 displayClassEdit();
                 break;
             case "Students":
-                echo "edit student";
+                showClassListNav();
                 break;
             case "Subjects":
                 displaySubjectEdit();
@@ -57,5 +61,36 @@ function handle()
     // subject add button
     if(isset($_POST["btn-add-subject"])){
         header("Location: add_subject.php");
+    }
+
+    // STUDENTS
+    if (isset($_POST['year']) && isset($_POST['class'])) {
+        $rclasses = getClassesFromDB();
+        $class = $_POST['class'];
+        $year = $_POST['year'];
+        foreach ($rclasses as $class_) $classes[] = $class_[0];
+
+        if (in_array($class, $classes)) {
+            displayClassTable($class, $year);
+        }
+    }
+
+    // edit student
+    if (isset($_POST["btn-edit-student"])) {
+        header("Location: edit_student.php?studentID=".$_POST["btn-edit-student"]);
+    }
+    // delete student
+    if (isset($_POST["btn-delete-student"])) {
+        $sql = "DELETE FROM students WHERE id=".$_POST["btn-delete-student"];
+        $success = updateRecord($sql);
+
+        if (!$success) echo "Error deleting student";
+    }
+    // add student
+    if (isset($_POST["year"])) $_SESSION["year"] = $_POST["year"];
+    if (isset($_POST["class"])) $_SESSION["class"] = $_POST["class"];
+
+    if(isset($_POST["btn-add-student"])){
+        header("Location: add_student.php");
     }
 }

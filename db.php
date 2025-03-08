@@ -240,6 +240,15 @@ function getClassDataFromID($id) {
     $mysqli->close();
     return $res->fetch_all(MYSQLI_ASSOC);
 }
+function getStudentDataFromID($id) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT s.id as id, s.lastname as lastName, s.firstname as firstName, s.gender as gender, c.class_name as class  
+                    FROM students s
+                    JOIN classes c ON s.class_id = c.id
+                    WHERE s.id = $id;");
+    $mysqli->close();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
 function getSubjectDataByID($id) {
     $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
     $res = $mysqli->query("SELECT * FROM subjects WHERE id = $id;");
@@ -270,4 +279,10 @@ function getMaxID($table) {
     $res = $mysqli->query("SELECT MAX(id) as max FROM $table;");
     $mysqli->close();
     return $res->fetch_all(MYSQLI_ASSOC);
+}
+function getClassesFromDB() {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT DISTINCT class_name FROM classes;");
+    $mysqli->close();
+    return $res->fetch_all();
 }
