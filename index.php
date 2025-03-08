@@ -9,8 +9,10 @@ include_once "request.php";
 
 htmlHead();
 htmlStart();
+displayAdminButton();
 
 displayNav();
 requestHandle();
+
 
 htmlEnd();

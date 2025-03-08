@@ -73,6 +73,9 @@ td {
 td.half-width {
     width: 4vw;
 }
+td.min-width {
+    width: 2vw;
+}
 td.bold {
     font-weight: bold;
 }

@@ -55,6 +55,10 @@ function showStatisticsForm() {
         <input class='btn btn-query' type='submit' name='statistics' value='Hall of Fame'>
         <input class='btn btn-query' type='submit' name='statistics' value='Best students by year'></form>";
 }
+function displayAdminButton() {
+    echo "<form method='POST'>
+        <input class='btn btn-query' type='submit' name='admin' value='Admin'></form>";
+}
 function displayTable($class, $year) {
     $subjects = getSubjectsFromDB();
     $classID = getClassIdFromDB($class, $year)->fetch_assoc()['id'];

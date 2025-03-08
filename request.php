@@ -14,6 +14,10 @@ function requestHandle() {
         dropDB();
     }
 
+    if(isset($_POST["admin"])) {
+        header("Location: admin.php");
+    }
+
     if (isset($_GET['class']) && isset($_GET['year'])) {
         $classes = $_SESSION['data']['classes'];
         $class = $_GET['class'];

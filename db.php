@@ -227,3 +227,47 @@ LIMIT 10
     $mysqli->close();
     return $res->fetch_all(MYSQLI_ASSOC);
 }
+/* ADMIN */
+function getAllClassIDs() {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT id, class_name as class, `year` FROM classes;");
+    $mysqli->close();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
+function getClassDataFromID($id) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT id, class_name as class, `year` FROM classes WHERE id = $id;");
+    $mysqli->close();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
+function getSubjectDataByID($id) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT * FROM subjects WHERE id = $id;");
+    $mysqli->close();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
+function updateRecord($sql) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query($sql);
+    $mysqli->close();
+    return $res;
+}
+function dbClassExists($name, $year) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT * FROM classes WHERE class_name = '$name' AND `year` = $year;");
+    $mysqli->close();
+    return $res->num_rows > 0;
+}
+function dbSubjectExists($name) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT * FROM subjects WHERE subject_name = '$name';");
+    $mysqli->close();
+    return $res->num_rows > 0;
+}
+
+function getMaxID($table) {
+    $mysqli = mysqli_connect(SERVER, USERNAME, PASSWORD, DATABASE);
+    $res = $mysqli->query("SELECT MAX(id) as max FROM $table;");
+    $mysqli->close();
+    return $res->fetch_all(MYSQLI_ASSOC);
+}
