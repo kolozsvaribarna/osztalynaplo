@@ -3,36 +3,15 @@
 * @author Kolozsvári Barnabás
 */
 
-require_once "html-functions.php";
+include_once "html.php";
+include_once "db.php";
+include_once "request.php";
 
 htmlHead();
+htmlStart();
+displayAdminButton();
 
-if (!isset($_GET['class'])){
-    showClassList();
-}
+displayNav();
+requestHandle();
 
-if (isset($_GET['subjectAverages'])) {
-    showQueryOptions("Subject averages");
-    showSchoolAvgsTable();
-    showClassAvgsTable();
-}
-elseif (isset($_GET['studentRanking'])) {
-    showQueryOptions("Student averages");
-    showStudentRankingOptions();
-}
-elseif (isset($_GET['bestAndWorstClasses'])) {
-    showQueryOptions("Best and worst classes");
-    showBestWorstClass();
-}
-
-if (isset($_GET['rankClasses'])) {
-    showQueryOptions("Student averages - Classes");
-    showStudentRankingOptions();
-    // table
-    showCumulativeClassRankings();
-}
-elseif (isset($_GET['rankSchool'])) {
-    showQueryOptions("Student averages - Whole school");
-    showStudentRankingOptions();
-    showSchoolRanking();
-}
+htmlEnd();

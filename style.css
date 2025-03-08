@@ -5,6 +5,12 @@
     user-select: none;
     font-family: Arial, Helvetica, sans-serif
 }
+select {
+    font-weight: bold;
+    padding: 5px 15px;
+    text-align: center;
+    cursor: pointer;
+}
 .btn {
     font-weight: bold;
     padding: 5px 15px;
@@ -21,10 +27,31 @@
 .btn-query {
     color: blue;
 }
+.btn-right {
+    display: inline-block;
+    margin-right: 10px;
+    float: right;
+}
+.msg {
+    color: green;
+    font-weight: bold
+}
+.msg-error {
+    color: red;
+    font-weight: bold;
+}
+.msg-right {
+    display: block;
+    text-align: right;
+    margin: 10px;
+}
 table {
     display: block;
     border-collapse: collapse;
     margin: 10px 0;
+}
+table.table-hover-disable {
+    pointer-events: none;
 }
 tr:nth-child(1), tr:nth-child(1):hover {
     background-color: unset;
@@ -35,19 +62,19 @@ tr:nth-child(2n), tr:nth-child(2n).hover-disable:hover {
 tr:hover, tr:nth-child(2n):hover {
     background-color: lightcoral;
 }
-tr.best-class, tr.best-class:hover {
-    background-color: #BDE7BD;
-}
-tr.worst-class, tr.worst-class:hover {
-    background-color: #FFB6B3;
-}
 td {
     text-align: center;
     vertical-align: middle;
     border: 1px black solid;
-    width: 9.5vw;
+    width: 9vw;
     height: 25px;
     text-transform: capitalize;
+}
+td.half-width {
+    width: 4vw;
+}
+td.min-width {
+    width: 2vw;
 }
 td.bold {
     font-weight: bold;
@@ -74,83 +101,25 @@ td.table-title {
     padding: 5px;
     font-weight: bold;
 }
+td.td-invisible {
+    background-color: white;
+    border: none;
+}
+td.td-highlight {
+    font-weight: bold;
+    color: white;
+    background-color: #2F4F4F;
+}
+td.td-avg {
+    background-color: white;
+}
+table.class-table {
+    margin: 2vh 0 4vh 0;
+}
 h2, p {
     font-variant: small-caps;
 }
 h2.class-title {
-    /*width: 23vw;*/
-    /*width: fit-content;*/
     font-size: xx-large;
     text-transform: uppercase;
-}
-.error {
-    font-weight: bold;
-    color: red;
-}
-.notif {
-    font-weight: bold;
-    color: green;
-}
-.msg {
-    font-weight: bold;
-    color: blue;
-}
-form {
-    display: inline-flex;
-    width: 100%;
-    margin: 0 0 10px 0;
-}
-table.class-ranking-table tr {
-    background-color: unset;
-}
-table.class-ranking-table tr:nth-child(n+2):hover {
-    background-color: #c1e1ec;
-}
-table.class-ranking-table tr:nth-child(-n+4):nth-child(n+2) {
-    background-color: #BDE7BD;
-}
-table.class-ranking-table tr:nth-child(-n+4):nth-child(n+2):hover {
-    background-color: forestgreen;
-    color: white;
-}
-table.class-ranking-table tr:nth-last-child(-n+3):nth-last-child(n+1) {
-    background-color: #FFB6B3;
-}
-table.class-ranking-table tr:nth-last-child(-n+3):nth-last-child(n+1):hover {
-    background-color: indianred;
-    color: white;
-}
-.messagebox {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    padding: 15px 20px;
-    background-color: #2b812f;
-    color: white;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
-    opacity: 0;
-    animation: showAndHide 5s ease forwards;
-}
-.messagebox.error {
-    background-color: #dc3545;
-}
-@keyframes showAndHide {
-    0% {
-        opacity: 0;
-        transform: translateY(-20px); /* fade in */
-    }
-    10% {
-        opacity: 1;
-        transform: translateY(0); /* visible */
-    }
-    90% {
-        opacity: 1;
-        transform: translateY(0); /* visible */
-    }
-    100% {
-        opacity: 0;
-        transform: translateY(-20px); /* fade out */
-    }
 }
